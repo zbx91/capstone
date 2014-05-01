@@ -364,6 +364,7 @@ endif
 endif
 
 $(PKGCFGF):
+	@mkdir -p $(@D)
 ifeq ($(V),0)
 	$(call log,GEN,$(@:$(BLDIR)/%=%))
 	@$(generate-pkgcfg)
