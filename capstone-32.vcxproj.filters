@@ -93,9 +93,6 @@
     <ClInclude Include="SStream.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="SubtargetFeature.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="utils.h">
       <Filter>core</Filter>
     </ClInclude>
