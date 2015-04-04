@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="cs.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="MCInst.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="MCInstrDesc.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="MCRegisterInfo.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="SStream.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\ARM\ARMDisassembler.c">
+      <Filter>arch\ARM</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\ARM\ARMInstPrinter.c">
+      <Filter>arch\ARM</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\ARM\ARMMapping.c">
+      <Filter>arch\ARM</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\ARM\ARMModule.c">
+      <Filter>arch\ARM</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\AArch64\AArch64BaseInfo.c">
+      <Filter>arch\AArch64</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\AArch64\AArch64Disassembler.c">
+      <Filter>arch\AArch64</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\AArch64\AArch64InstPrinter.c">
+      <Filter>arch\AArch64</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\AArch64\AArch64Mapping.c">
+      <Filter>arch\AArch64</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\AArch64\AArch64Module.c">
+      <Filter>arch\AArch64</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\X86\X86ATTInstPrinter.c">
+      <Filter>arch\X86</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\X86\X86Disassembler.c">
+      <Filter>arch\X86</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\X86\X86DisassemblerDecoder.c">
+      <Filter>arch\X86</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\X86\X86IntelInstPrinter.c">
+      <Filter>arch\X86</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\X86\X86Mapping.c">
+      <Filter>arch\X86</Filter>
+    </ClCompile>
+    <ClCompile Include="arch\X86\X86Module.c">
+      <Filter>arch\X86</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cs_priv.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="LEB128.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="MathExtras.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="MCDisassembler.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="MCFixedLenDisassembler.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="MCInst.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="MCInstrDesc.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="MCRegisterInfo.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="SStream.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\ARM\ARMAddressingModes.h">
+      <Filter>arch\ARM</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\ARM\ARMBaseInfo.h">
+      <Filter>arch\ARM</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\ARM\ARMDisassembler.h">
+      <Filter>arch\ARM</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\ARM\ARMInstPrinter.h">
+      <Filter>arch\ARM</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\ARM\ARMMapping.h">
+      <Filter>arch\ARM</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\AArch64\AArch64BaseInfo.h">
+      <Filter>arch\AArch64</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\AArch64\AArch64Disassembler.h">
+      <Filter>arch\AArch64</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\AArch64\AArch64InstPrinter.h">
+      <Filter>arch\AArch64</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\AArch64\AArch64Mapping.h">
+      <Filter>arch\AArch64</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\X86\X86Disassembler.h">
+      <Filter>arch\X86</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\X86\X86DisassemblerDecoder.h">
+      <Filter>arch\X86</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\X86\X86DisassemblerDecoderCommon.h">
+      <Filter>arch\X86</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\X86\X86InstPrinter.h">
+      <Filter>arch\X86</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\X86\X86Mapping.h">
+      <Filter>arch\X86</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\X86\X86BaseInfo.h">
+      <Filter>arch\X86</Filter>
+    </ClInclude>
+    <ClInclude Include="arch\AArch64\AArch64AddressingModes.h">
+      <Filter>arch\AArch64</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\arm.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\arm64.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\capstone.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\mips.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\platform.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\ppc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\sparc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\systemz.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\x86.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\capstone\xcore.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="myinttypes.h">
+      <Filter>core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{abeaff6f-01d2-485c-8726-be4ba69bf519}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{c554ca91-65b7-44bb-bf76-ee709e343775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arch">
+      <UniqueIdentifier>{06378b47-2fc9-44d4-8b82-25261fe18fd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arch\ARM">
+      <UniqueIdentifier>{69bbd412-948d-473b-b82b-16bde7e97ded}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arch\AArch64">
+      <UniqueIdentifier>{39f2d3b2-cef1-4117-852e-1d5e11601e6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arch\X86">
+      <UniqueIdentifier>{8b472177-217c-44c7-921a-f38788f8081a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="arch\ARM\ARMGenAsmWriter.inc">
+      <Filter>arch\ARM</Filter>
+    </None>
+    <None Include="arch\ARM\ARMGenDisassemblerTables.inc">
+      <Filter>arch\ARM</Filter>
+    </None>
+    <None Include="arch\ARM\ARMGenInstrInfo.inc">
+      <Filter>arch\ARM</Filter>
+    </None>
+    <None Include="arch\ARM\ARMGenRegisterInfo.inc">
+      <Filter>arch\ARM</Filter>
+    </None>
+    <None Include="arch\ARM\ARMGenSubtargetInfo.inc">
+      <Filter>arch\ARM</Filter>
+    </None>
+    <None Include="arch\AArch64\AArch64GenAsmWriter.inc">
+      <Filter>arch\AArch64</Filter>
+    </None>
+    <None Include="arch\AArch64\AArch64GenDisassemblerTables.inc">
+      <Filter>arch\AArch64</Filter>
+    </None>
+    <None Include="arch\AArch64\AArch64GenInstrInfo.inc">
+      <Filter>arch\AArch64</Filter>
+    </None>
+    <None Include="arch\AArch64\AArch64GenRegisterInfo.inc">
+      <Filter>arch\AArch64</Filter>
+    </None>
+    <None Include="arch\AArch64\AArch64GenSubtargetInfo.inc">
+      <Filter>arch\AArch64</Filter>
+    </None>
+    <None Include="arch\X86\X86GenAsmWriter.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86GenAsmWriter_reduce.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86GenAsmWriter1.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86GenAsmWriter1_reduce.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86GenDisassemblerTables.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86GenDisassemblerTables_reduce.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86GenInstrInfo.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86GenInstrInfo_reduce.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86GenRegisterInfo.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86MappingInsn.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86MappingInsn_reduce.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86MappingInsnOp.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\X86\X86MappingInsnOp_reduce.inc">
+      <Filter>arch\X86</Filter>
+    </None>
+    <None Include="arch\AArch64\AArch64MappingInsn.inc">
+      <Filter>arch\AArch64</Filter>
+    </None>
+    <None Include="arch\ARM\ARMMappingInsn.inc">
+      <Filter>arch\ARM</Filter>
+    </None>
+    <None Include="arch\ARM\ARMMappingInsnOp.inc">
+      <Filter>arch\ARM</Filter>
+    </None>
+  </ItemGroup>
+</Project>
