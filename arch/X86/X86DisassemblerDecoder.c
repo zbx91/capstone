@@ -2114,6 +2114,7 @@ static bool checkPrefix(struct InternalInstruction *insn)
 			case X86_BTS64mr:
 
 			// CMPXCHG
+			case X86_CMPXCHG16B:
 			case X86_CMPXCHG16rm:
 			case X86_CMPXCHG32rm:
 			case X86_CMPXCHG64rm:
