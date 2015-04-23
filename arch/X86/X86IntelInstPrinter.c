@@ -17,10 +17,16 @@
 
 #ifdef CAPSTONE_HAS_X86
 
+#if !defined(CAPSTONE_HAS_OSXKERNEL)
 #include <ctype.h>
+#endif
 #include "../../myinttypes.h"
+#if defined(CAPSTONE_HAS_OSXKERNEL)
+#include <libkern/libkern.h>
+#else
 #include <stdio.h>
 #include <stdlib.h>
+#endif
 #include <string.h>
 
 #include "../../utils.h"
@@ -285,7 +291,7 @@ static void _printOperand(MCInst *MI, unsigned OpNo, SStream *O)
 }
 
 #ifndef CAPSTONE_DIET
-// convert Intel access info to AT&T access info
+// copy & normalize access info
 static void get_op_access(cs_struct *h, unsigned int id, uint8_t *access, uint64_t *eflags)
 {
 #ifndef CAPSTONE_DIET
@@ -563,6 +569,7 @@ void X86_Intel_printInst(MCInst *MI, SStream *O, void *Info)
 {
 	char *mnem;
 	x86_reg reg, reg2;
+	uint8_t imm_sz = 0;
 
 	// Try to print any aliases first.
 	mnem = printAliasInstr(MI, O, Info);
@@ -571,7 +578,7 @@ void X86_Intel_printInst(MCInst *MI, SStream *O, void *Info)
 	else
 		printInstruction(MI, O, Info);
 
-	reg = X86_insn_reg_intel(MCInst_getOpcode(MI));
+	reg = X86_insn_reg_intel(MCInst_getOpcode(MI), &imm_sz);
 	if (MI->csh->detail) {
 #ifndef CAPSTONE_DIET
 		uint8_t access[6];
@@ -586,7 +593,7 @@ void X86_Intel_printInst(MCInst *MI, SStream *O, void *Info)
 			MI->flat_insn->detail->x86.operands[0].type = X86_OP_REG;
 			MI->flat_insn->detail->x86.operands[0].reg = reg;
 			MI->flat_insn->detail->x86.operands[0].size = MI->csh->regsize_map[reg];
-			MI->flat_insn->detail->x86.operands[1].size = MI->csh->regsize_map[reg];
+			MI->flat_insn->detail->x86.operands[1].size = imm_sz ? imm_sz : MI->csh->regsize_map[reg];
 			MI->flat_insn->detail->x86.op_count++;
 		} else {
 			if (X86_insn_reg_intel2(MCInst_getOpcode(MI), &reg, &reg2)) {
@@ -658,7 +665,9 @@ static void printPCRelImm(MCInst *MI, unsigned OpNo, SStream *O)
 
 static void printOperand(MCInst *MI, unsigned OpNo, SStream *O)
 {
+	int opsize = 0;
 	MCOperand *Op  = MCInst_getOperand(MI, OpNo);
+
 	if (MCOperand_isReg(Op)) {
 		unsigned int reg = MCOperand_getReg(Op);
 
@@ -692,6 +701,7 @@ static void printOperand(MCInst *MI, unsigned OpNo, SStream *O)
 		switch(MCInst_getOpcode(MI)) {
 			default:
 				break;
+
 			case X86_AAD8i8:
 			case X86_AAM8i8:
 			case X86_ADC8i8:
@@ -703,7 +713,76 @@ static void printOperand(MCInst *MI, unsigned OpNo, SStream *O)
 			case X86_SUB8i8:
 			case X86_TEST8i8:
 			case X86_XOR8i8:
+			case X86_ROL8ri:
+			case X86_ADC8ri:
+			case X86_ADC8ri8:
+			case X86_ADD8ri:
+			case X86_ADD8ri8:
+			case X86_AND8ri:
+			case X86_AND8ri8:
+			case X86_CMP8ri:
+			case X86_CMP8ri8:
+			case X86_IN8ri:
+			case X86_MOV8ri:
+			case X86_MOV8ri_alt:
+			case X86_OR8ri:
+			case X86_OR8ri8:
+			case X86_RCL8ri:
+			case X86_RCR8ri:
+			case X86_ROR8ri:
+			case X86_SAL8ri:
+			case X86_SAR8ri:
+			case X86_SBB8ri:
+			case X86_SBB8ri8:
+			case X86_SHL8ri:
+			case X86_SHR8ri:
+			case X86_SUB8ri:
+			case X86_SUB8ri8:
+			case X86_TEST8ri:
+			case X86_TEST8ri_NOREX:
+			case X86_TEST8ri_alt:
+			case X86_XOR8ri:
+			case X86_XOR8ri8:
+			case X86_OUT8ir:
+
+			case X86_ADC8mi:
+			case X86_ADC8mi8:
+			case X86_ADD8mi:
+			case X86_ADD8mi8:
+			case X86_AND8mi:
+			case X86_AND8mi8:
+			case X86_CMP8mi:
+			case X86_CMP8mi8:
+			case X86_LOCK_ADD8mi:
+			case X86_LOCK_AND8mi:
+			case X86_LOCK_OR8mi:
+			case X86_LOCK_SUB8mi:
+			case X86_LOCK_XOR8mi:
+			case X86_MOV8mi:
+			case X86_OR8mi:
+			case X86_OR8mi8:
+			case X86_RCL8mi:
+			case X86_RCR8mi:
+			case X86_ROL8mi:
+			case X86_ROR8mi:
+			case X86_SAL8mi:
+			case X86_SAR8mi:
+			case X86_SBB8mi:
+			case X86_SBB8mi8:
+			case X86_SHL8mi:
+			case X86_SHR8mi:
+			case X86_SUB8mi:
+			case X86_SUB8mi8:
+			case X86_TEST8mi:
+			case X86_TEST8mi_alt:
+			case X86_XOR8mi:
+			case X86_XOR8mi8:
+			case X86_PUSH64i8:
+			case X86_CMP32ri8:
+			case X86_CMP64ri8:
+
 				imm = imm & 0xff;
+				opsize = 1;	// immediate of 1 byte
 				break;
 		}
 
@@ -761,7 +840,9 @@ static void printOperand(MCInst *MI, unsigned OpNo, SStream *O)
 #endif
 
 				MI->flat_insn->detail->x86.operands[MI->flat_insn->detail->x86.op_count].type = X86_OP_IMM;
-				if (MI->flat_insn->detail->x86.op_count > 0)
+				if (opsize > 0)
+					MI->flat_insn->detail->x86.operands[MI->flat_insn->detail->x86.op_count].size = opsize;
+				else if (MI->flat_insn->detail->x86.op_count > 0)
 					MI->flat_insn->detail->x86.operands[MI->flat_insn->detail->x86.op_count].size = MI->flat_insn->detail->x86.operands[0].size;
 				else
 					MI->flat_insn->detail->x86.operands[MI->flat_insn->detail->x86.op_count].size = MI->imm_size;

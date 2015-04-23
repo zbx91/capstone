@@ -43,6 +43,10 @@ ifeq ($(CAPSTONE_USE_SYS_DYN_MEM),yes)
 CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
 endif
 
+ifeq ($(CAPSTONE_HAS_OSXKERNEL), yes)
+CFLAGS += -DCAPSTONE_HAS_OSXKERNEL
+endif
+
 CFLAGS += $(foreach arch,$(LIBARCHS),-arch $(arch))
 LDFLAGS += $(foreach arch,$(LIBARCHS),-arch $(arch))
 
@@ -87,6 +91,7 @@ DEP_ARM += arch/ARM/ARMGenInstrInfo.inc
 DEP_ARM += arch/ARM/ARMGenRegisterInfo.inc
 DEP_ARM += arch/ARM/ARMGenSubtargetInfo.inc
 DEP_ARM += arch/ARM/ARMMappingInsn.inc
+DEP_ARM += arch/ARM/ARMMappingInsnOp.inc
 
 LIBOBJ_ARM =
 ifneq (,$(findstring arm,$(CAPSTONE_ARCHS)))
@@ -364,7 +369,6 @@ endif
 endif
 
 $(PKGCFGF):
-	@mkdir -p $(@D)
 ifeq ($(V),0)
 	$(call log,GEN,$(@:$(BLDIR)/%=%))
 	@$(generate-pkgcfg)

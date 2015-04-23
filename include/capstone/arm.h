@@ -262,11 +262,14 @@ typedef struct arm_op_mem {
 // Instruction operand
 typedef struct cs_arm_op {
 	int vector_index;	// Vector Index for some vector operands (or -1 if irrelevant)
+
 	struct {
 		arm_shifter type;
 		unsigned int value;
 	} shift;
+
 	arm_op_type type;	// operand type
+
 	union {
 		unsigned int reg;	// register value for REG/SYSREG operand
 		int32_t imm;			// immediate value for C-IMM, P-IMM or IMM operand
@@ -274,9 +277,18 @@ typedef struct cs_arm_op {
 		arm_op_mem mem;		// base/index/scale/disp value for MEM operand
 		arm_setend_type setend; // SETEND instruction's operand type
 	};
+
 	// in some instructions, an operand can be subtracted or added to
 	// the base register,
 	bool subtracted; // if TRUE, this operand is subtracted. otherwise, it is added.
+
+	// How is this operand accessed? (READ, WRITE or READ|WRITE)
+	// This field is combined of cs_ac_type.
+	// NOTE: this field is irrelevant if engine is compiled in DIET mode.
+	uint8_t access;
+
+	// Neon lane index for NEON instructions (or -1 if irrelevant)
+	int8_t neon_lane;
 } cs_arm_op;
 
 // Instruction structure
@@ -843,18 +855,14 @@ typedef enum arm_insn {
 	ARM_INS_IT,
 	ARM_INS_LSL,
 	ARM_INS_LSR,
-	ARM_INS_ASRS,
-	ARM_INS_LSRS,
 	ARM_INS_ORN,
 	ARM_INS_ROR,
 	ARM_INS_RRX,
-	ARM_INS_SUBS,
 	ARM_INS_SUBW,
 	ARM_INS_TBB,
 	ARM_INS_TBH,
 	ARM_INS_CBNZ,
 	ARM_INS_CBZ,
-	ARM_INS_MOVS,
 	ARM_INS_POP,
 	ARM_INS_PUSH,
 

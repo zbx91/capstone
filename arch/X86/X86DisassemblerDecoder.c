@@ -19,7 +19,11 @@
 #ifdef CAPSTONE_HAS_X86
 
 #include <stdarg.h>   /* for va_*()       */
+#if defined(CAPSTONE_HAS_OSXKERNEL)
+#include <libkern/libkern.h>
+#else
 #include <stdlib.h>   /* for exit()       */
+#endif
 
 #include "../../cs_priv.h"
 #include "../../utils.h"
@@ -400,7 +404,8 @@ static int readPrefixes(struct InternalInstruction *insn)
 						return -1;
 					if ((byte & 0xf0) == 0x40) {
 						// another REX prefix, but we only remember the last one
-						consumeByte(insn, &byte);
+						if (consumeByte(insn, &byte))
+							return -1;
 					} else
 						break;
 				}
@@ -435,8 +440,11 @@ static int readPrefixes(struct InternalInstruction *insn)
 			break;
 
 		if (insn->readerCursor - 1 == insn->startLocation
-				&& (byte == 0xf2 || byte == 0xf3)
-				&& !lookAtByte(insn, &nextByte)) {
+				&& (byte == 0xf2 || byte == 0xf3)) {
+
+			if (lookAtByte(insn, &nextByte))
+				return -1;
+
 			/*
 			 * If the byte is 0xf2 or 0xf3, and any of the following conditions are
 			 * met:
@@ -652,8 +660,10 @@ static int readPrefixes(struct InternalInstruction *insn)
 
 		if (insn->vectorExtensionType == TYPE_VEX_3B) {
 			insn->vectorExtensionPrefix[0] = byte;
-			consumeByte(insn, &insn->vectorExtensionPrefix[1]);
-			consumeByte(insn, &insn->vectorExtensionPrefix[2]);
+			if (consumeByte(insn, &insn->vectorExtensionPrefix[1]))
+				return -1;
+			if (consumeByte(insn, &insn->vectorExtensionPrefix[2]))
+				return -1;
 
 			/* We simulate the REX prefix for simplicity's sake */
 			if (insn->mode == MODE_64BIT) {
@@ -681,7 +691,8 @@ static int readPrefixes(struct InternalInstruction *insn)
 
 		if (insn->vectorExtensionType == TYPE_VEX_2B) {
 			insn->vectorExtensionPrefix[0] = byte;
-			consumeByte(insn, &insn->vectorExtensionPrefix[1]);
+			if (consumeByte(insn, &insn->vectorExtensionPrefix[1]))
+				return -1;
 
 			if (insn->mode == MODE_64BIT) {
 				insn->rexPrefix = 0x40
@@ -714,8 +725,10 @@ static int readPrefixes(struct InternalInstruction *insn)
 
 		if (insn->vectorExtensionType == TYPE_XOP) {
 			insn->vectorExtensionPrefix[0] = byte;
-			consumeByte(insn, &insn->vectorExtensionPrefix[1]);
-			consumeByte(insn, &insn->vectorExtensionPrefix[2]);
+			if (consumeByte(insn, &insn->vectorExtensionPrefix[1]))
+				return -1;
+			if (consumeByte(insn, &insn->vectorExtensionPrefix[2]))
+				return -1;
 
 			/* We simulate the REX prefix for simplicity's sake */
 			if (insn->mode == MODE_64BIT) {
@@ -744,7 +757,8 @@ static int readPrefixes(struct InternalInstruction *insn)
 						return -1;
 					if ((opcodeByte & 0xf0) == 0x40) {
 						// another REX prefix, but we only remember the last one
-						consumeByte(insn, &byte);
+						if (consumeByte(insn, &byte))
+							return -1;
 					} else
 						break;
 				}
@@ -813,7 +827,7 @@ static int readOpcode(struct InternalInstruction *insn)
 	/* Determine the length of the primary opcode */
 	uint8_t current;
 
-	// printf(">>> readOpcode()\n");
+	// printf(">>> readOpcode() = %x\n", insn->readerCursor);
 
 	insn->opcodeType = ONEBYTE;
 
@@ -1463,8 +1477,6 @@ static int readModRM(struct InternalInstruction *insn)
 	// already got ModRM byte?
 	if (insn->consumedModRM)
 		return 0;
-
-	insn->modRMLocation = insn->readerCursor;
 
 	if (consumeByte(insn, &insn->modRM))
 		return -1;
