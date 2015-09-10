@@ -2296,6 +2296,7 @@ static insn_map insns[] = {	// reduce x86 instructions
 };
 #endif
 
+#ifndef CAPSTONE_DIET
 // replace r1 = r2
 static void arr_replace(uint16_t *arr, uint8_t max, x86_reg r1, x86_reg r2)
 {
@@ -2308,6 +2309,7 @@ static void arr_replace(uint16_t *arr, uint8_t max, x86_reg r1, x86_reg r2)
 		}
 	}
 }
+#endif
 
 // given internal insn id, return public instruction info
 void X86_get_insn_id(cs_struct *h, cs_insn *insn, unsigned int id)
@@ -2925,6 +2927,7 @@ static bool valid_repe(cs_struct *h, unsigned int opcode)
 	return false;
 }
 
+#ifndef CAPSTONE_DIET
 // add *CX register to regs_read[] & regs_write[]
 static void add_cx(MCInst *MI)
 {
@@ -2945,6 +2948,7 @@ static void add_cx(MCInst *MI)
 		MI->flat_insn->detail->regs_write_count++;
 	}
 }
+#endif
 
 // return true if we patch the mnemonic
 bool X86_lockrep(MCInst *MI, SStream *O)
