@@ -55,6 +55,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ClCompile Include="arch\X86\X86ATTInstPrinter.c" />
     <ClCompile Include="arch\X86\X86Disassembler.c" />
     <ClCompile Include="arch\X86\X86DisassemblerDecoder.c" />
     <ClCompile Include="arch\X86\X86IntelInstPrinter.c" />
