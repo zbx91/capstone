@@ -261,6 +261,8 @@ static DecodeStatus decodeMemRIOperands(MCInst *Inst, uint64_t Imm,
 	uint64_t Disp = Imm & 0xFFFF;
 
 	// assert(Base < 32 && "Invalid base register");
+	if (Base >= 32)
+		return MCDisassembler_Fail;
 
 	switch (MCInst_getOpcode(Inst)) {
 		default: break;
@@ -316,6 +318,8 @@ static DecodeStatus decodeCRBitMOperand(MCInst *Inst, uint64_t Imm,
 
 	unsigned Zeros = CountTrailingZeros_64(Imm);
 	// assert(Zeros < 8 && "Invalid CR bit value");
+	if (Zeros >=8)
+		return MCDisassembler_Fail;
 
 	MCOperand_CreateReg0(Inst, CRRegs[7 - Zeros]);
 	return MCDisassembler_Success;
@@ -346,7 +350,7 @@ static DecodeStatus getInstruction(MCInst *MI,
 			(code[1] <<  8) | (code[0] <<  0);
 
 	if (MI->flat_insn->detail) {
-		memset(&MI->flat_insn->detail->ppc, 0, offsetof(cs_ppc, operands));
+		memset(MI->flat_insn->detail, 0, sizeof(cs_detail));
 	}
 
 	result = decodeInstruction_4(DecoderTable32, MI, insn, Address, 4);

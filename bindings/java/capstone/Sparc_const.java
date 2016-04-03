@@ -146,7 +146,8 @@ public class Sparc_const {
 	public static final int SPARC_REG_O7 = 84;
 	public static final int SPARC_REG_SP = 85;
 	public static final int SPARC_REG_Y = 86;
-	public static final int SPARC_REG_MAX = 87;
+	public static final int SPARC_REG_XCC = 87;
+	public static final int SPARC_REG_ENDING = 88;
 	public static final int SPARC_REG_O6 = SPARC_REG_SP;
 	public static final int SPARC_REG_I6 = SPARC_REG_FP;
 
@@ -429,18 +430,24 @@ public class Sparc_const {
 	public static final int SPARC_INS_XNOR = 274;
 	public static final int SPARC_INS_XORCC = 275;
 	public static final int SPARC_INS_XOR = 276;
-	public static final int SPARC_INS_MAX = 277;
+	public static final int SPARC_INS_RET = 277;
+	public static final int SPARC_INS_RETL = 278;
+	public static final int SPARC_INS_ENDING = 279;
 
 	// Group of SPARC instructions
 
 	public static final int SPARC_GRP_INVALID = 0;
-	public static final int SPARC_GRP_HARDQUAD = 1;
-	public static final int SPARC_GRP_V9 = 2;
-	public static final int SPARC_GRP_VIS = 3;
-	public static final int SPARC_GRP_VIS2 = 4;
-	public static final int SPARC_GRP_VIS3 = 5;
-	public static final int SPARC_GRP_32BIT = 6;
-	public static final int SPARC_GRP_64BIT = 7;
-	public static final int SPARC_GRP_JUMP = 8;
-	public static final int SPARC_GRP_MAX = 9;
+
+	// Generic groups
+	public static final int SPARC_GRP_JUMP = 1;
+
+	// Architecture-specific groups
+	public static final int SPARC_GRP_HARDQUAD = 128;
+	public static final int SPARC_GRP_V9 = 129;
+	public static final int SPARC_GRP_VIS = 130;
+	public static final int SPARC_GRP_VIS2 = 131;
+	public static final int SPARC_GRP_VIS3 = 132;
+	public static final int SPARC_GRP_32BIT = 133;
+	public static final int SPARC_GRP_64BIT = 134;
+	public static final int SPARC_GRP_ENDING = 135;
 }

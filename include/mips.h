@@ -21,10 +21,10 @@ extern "C" {
 
 //> Operand type for instruction's operands
 typedef enum mips_op_type {
-	MIPS_OP_INVALID = 0,	// Uninitialized.
-	MIPS_OP_REG,	// Register operand.
-	MIPS_OP_IMM,	// Immediate operand.
-	MIPS_OP_MEM,	// Memory operand
+	MIPS_OP_INVALID = 0, // = CS_OP_INVALID (Uninitialized).
+	MIPS_OP_REG, // = CS_OP_REG (Register operand).
+	MIPS_OP_IMM, // = CS_OP_IMM (Immediate operand).
+	MIPS_OP_MEM, // = CS_OP_MEM (Memory operand).
 } mips_op_type;
 
 // Instruction's operand referring to memory
@@ -55,7 +55,7 @@ typedef struct cs_mips {
 //> MIPS registers
 typedef enum mips_reg {
 	MIPS_REG_INVALID = 0,
-	// General purpose registers
+	//> General purpose registers
 	MIPS_REG_0,
 	MIPS_REG_1,
 	MIPS_REG_2,
@@ -89,7 +89,7 @@ typedef enum mips_reg {
 	MIPS_REG_30,
 	MIPS_REG_31,
 
-	// DSP registers
+	//> DSP registers
 	MIPS_REG_DSPCCOND,
 	MIPS_REG_DSPCARRY,
 	MIPS_REG_DSPEFI,
@@ -102,13 +102,23 @@ typedef enum mips_reg {
 	MIPS_REG_DSPPOS,
 	MIPS_REG_DSPSCOUNT,
 
-	// ACC registers
+	//> ACC registers
 	MIPS_REG_AC0,
 	MIPS_REG_AC1,
 	MIPS_REG_AC2,
 	MIPS_REG_AC3,
 
-	// FPU registers
+	//> COP registers
+	MIPS_REG_CC0,
+	MIPS_REG_CC1,
+	MIPS_REG_CC2,
+	MIPS_REG_CC3,
+	MIPS_REG_CC4,
+	MIPS_REG_CC5,
+	MIPS_REG_CC6,
+	MIPS_REG_CC7,
+
+	//> FPU registers
 	MIPS_REG_F0,
 	MIPS_REG_F1,
 	MIPS_REG_F2,
@@ -151,7 +161,7 @@ typedef enum mips_reg {
 	MIPS_REG_FCC6,
 	MIPS_REG_FCC7,
 
-	// AFPR128
+	//> AFPR128
 	MIPS_REG_W0,
 	MIPS_REG_W1,
 	MIPS_REG_W2,
@@ -187,7 +197,6 @@ typedef enum mips_reg {
 
 	MIPS_REG_HI,
 	MIPS_REG_LO,
-	MIPS_REG_PC,
 
 	MIPS_REG_P0,
 	MIPS_REG_P1,
@@ -197,7 +206,7 @@ typedef enum mips_reg {
 	MIPS_REG_MPL1,
 	MIPS_REG_MPL2,
 
-	MIPS_REG_MAX,	// <-- mark the end of the list or registers
+	MIPS_REG_ENDING,	// <-- mark the end of the list or registers
 
 	// alias registers
 	MIPS_REG_ZERO = MIPS_REG_0,
@@ -287,16 +296,31 @@ typedef enum mips_insn {
 	MIPS_INS_BALC,
 	MIPS_INS_BALIGN,
 	MIPS_INS_BC,
+	MIPS_INS_BC0F,
+	MIPS_INS_BC0FL,
+	MIPS_INS_BC0T,
+	MIPS_INS_BC0TL,
 	MIPS_INS_BC1EQZ,
 	MIPS_INS_BC1F,
+	MIPS_INS_BC1FL,
 	MIPS_INS_BC1NEZ,
 	MIPS_INS_BC1T,
+	MIPS_INS_BC1TL,
 	MIPS_INS_BC2EQZ,
+	MIPS_INS_BC2F,
+	MIPS_INS_BC2FL,
 	MIPS_INS_BC2NEZ,
+	MIPS_INS_BC2T,
+	MIPS_INS_BC2TL,
+	MIPS_INS_BC3F,
+	MIPS_INS_BC3FL,
+	MIPS_INS_BC3T,
+	MIPS_INS_BC3TL,
 	MIPS_INS_BCLRI,
 	MIPS_INS_BCLR,
 	MIPS_INS_BEQ,
 	MIPS_INS_BEQC,
+	MIPS_INS_BEQL,
 	MIPS_INS_BEQZALC,
 	MIPS_INS_BEQZC,
 	MIPS_INS_BGEC,
@@ -304,10 +328,14 @@ typedef enum mips_insn {
 	MIPS_INS_BGEZ,
 	MIPS_INS_BGEZAL,
 	MIPS_INS_BGEZALC,
+	MIPS_INS_BGEZALL,
+	MIPS_INS_BGEZALS,
 	MIPS_INS_BGEZC,
+	MIPS_INS_BGEZL,
 	MIPS_INS_BGTZ,
 	MIPS_INS_BGTZALC,
 	MIPS_INS_BGTZC,
+	MIPS_INS_BGTZL,
 	MIPS_INS_BINSLI,
 	MIPS_INS_BINSL,
 	MIPS_INS_BINSRI,
@@ -317,12 +345,16 @@ typedef enum mips_insn {
 	MIPS_INS_BLEZ,
 	MIPS_INS_BLEZALC,
 	MIPS_INS_BLEZC,
+	MIPS_INS_BLEZL,
 	MIPS_INS_BLTC,
 	MIPS_INS_BLTUC,
 	MIPS_INS_BLTZ,
 	MIPS_INS_BLTZAL,
 	MIPS_INS_BLTZALC,
+	MIPS_INS_BLTZALL,
+	MIPS_INS_BLTZALS,
 	MIPS_INS_BLTZC,
+	MIPS_INS_BLTZL,
 	MIPS_INS_BMNZI,
 	MIPS_INS_BMNZ,
 	MIPS_INS_BMZI,
@@ -331,6 +363,7 @@ typedef enum mips_insn {
 	MIPS_INS_BNEC,
 	MIPS_INS_BNEGI,
 	MIPS_INS_BNEG,
+	MIPS_INS_BNEL,
 	MIPS_INS_BNEZALC,
 	MIPS_INS_BNEZC,
 	MIPS_INS_BNVC,
@@ -547,10 +580,13 @@ typedef enum mips_insn {
 	MIPS_INS_J,
 	MIPS_INS_JAL,
 	MIPS_INS_JALR,
+	MIPS_INS_JALRS,
+	MIPS_INS_JALS,
 	MIPS_INS_JALX,
 	MIPS_INS_JIALC,
 	MIPS_INS_JIC,
 	MIPS_INS_JR,
+	MIPS_INS_JRADDIUSP,
 	MIPS_INS_JRC,
 	MIPS_INS_JALRC,
 	MIPS_INS_LB,
@@ -807,14 +843,23 @@ typedef enum mips_insn {
 	MIPS_INS_NOP,
 	MIPS_INS_NEGU,
 
-	MIPS_INS_MAXIMUM,
+	//> special instructions
+	MIPS_INS_JALR_HB,	// jump and link with Hazard Barrier
+	MIPS_INS_JR_HB,		// jump register with Hazard Barrier
+
+	MIPS_INS_ENDING,
 } mips_insn;
 
 //> Group of MIPS instructions
 typedef enum mips_insn_group {
-	MIPS_GRP_INVALID = 0,
+	MIPS_GRP_INVALID = 0, // = CS_GRP_INVALID
 
-	MIPS_GRP_BITCOUNT,
+	//> Generic groups
+	// all jump instructions (conditional+direct+indirect jumps)
+	MIPS_GRP_JUMP,	// = CS_GRP_JUMP
+
+	//> Architecture-specific groups
+	MIPS_GRP_BITCOUNT = 128,
 	MIPS_GRP_DSP,
 	MIPS_GRP_DSPR2,
 	MIPS_GRP_FPIDX,
@@ -848,9 +893,7 @@ typedef enum mips_insn_group {
 	MIPS_GRP_GP32BIT,
 	MIPS_GRP_GP64BIT,
 
-	MIPS_GRP_JUMP,	// all jump instructions (conditional+direct+indirect jumps)
-
-	MIPS_GRP_MAX,
+	MIPS_GRP_ENDING,
 } mips_insn_group;
 
 #ifdef __cplusplus

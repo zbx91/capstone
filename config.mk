@@ -1,5 +1,5 @@
 # This file contains all customized compile options for Capstone.
-# Modify it before building step. Consult docs/README for details.
+# Consult COMPILE.TXT & docs/README for details.
 
 ################################################################################
 # Specify which archs you want to compile in. By default, we build all archs.
@@ -55,6 +55,11 @@ CAPSTONE_DIET ?= no
 
 CAPSTONE_X86_REDUCE ?= no
 
+################################################################################
+# Change 'CAPSTONE_X86_ATT_DISABLE = no' to 'CAPSTONE_X86_ATT_DISABLE = yes' to
+# disable AT&T syntax on x86 to reduce library size.
+
+CAPSTONE_X86_ATT_DISABLE ?= no
 
 ################################################################################
 # Change 'CAPSTONE_STATIC = yes' to 'CAPSTONE_STATIC = no' to avoid building
@@ -68,3 +73,10 @@ CAPSTONE_STATIC ?= yes
 # a shared library.
 
 CAPSTONE_SHARED ?= yes
+
+################################################################################
+# Change 'CAPSTONE_HAS_OSXKERNEL = no' to 'CAPSTONE_HAS_OSXKERNEL = yes' to
+# enable OS X kernel embedding support. If 'CAPSTONE_USE_SYS_DYN_MEM = yes',
+# then kern_os_* functions are used for memory management.
+
+CAPSTONE_HAS_OSXKERNEL ?= no

@@ -1,7 +1,11 @@
 /* Capstone Disassembly Engine */
 /* By Nguyen Anh Quynh <aquynh@gmail.com>, 2013-2014 */
 
+#if defined(CAPSTONE_HAS_OSXKERNEL)
+#include <libkern/libkern.h>
+#else
 #include <stdlib.h>
+#endif
 #include <string.h>
 
 #include "utils.h"
@@ -68,4 +72,17 @@ char *cs_strdup(const char *str)
 		return NULL;
 
 	return (char *)memmove(new, str, len);
+}
+
+// we need this since Windows doesnt have snprintf()
+int cs_snprintf(char *buffer, size_t size, const char *fmt, ...)
+{
+	int ret;
+
+	va_list ap;
+	va_start(ap, fmt);
+	ret = cs_vsnprintf(buffer, size, fmt, ap);
+	va_end(ap);
+
+	return ret;
 }

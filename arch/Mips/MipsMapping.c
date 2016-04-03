@@ -99,6 +99,15 @@ static name_map reg_name_maps[] = {
 	{ MIPS_REG_AC2, "ac2"},
 	{ MIPS_REG_AC3, "ac3"},
 
+	{ MIPS_REG_CC0, "cc0"},
+	{ MIPS_REG_CC1, "cc1"},
+	{ MIPS_REG_CC2, "cc2"},
+	{ MIPS_REG_CC3, "cc3"},
+	{ MIPS_REG_CC4, "cc4"},
+	{ MIPS_REG_CC5, "cc5"},
+	{ MIPS_REG_CC6, "cc6"},
+	{ MIPS_REG_CC7, "cc7"},
+
 	{ MIPS_REG_F0, "f0"},
 	{ MIPS_REG_F1, "f1"},
 	{ MIPS_REG_F2, "f2"},
@@ -176,14 +185,21 @@ static name_map reg_name_maps[] = {
 
 	{ MIPS_REG_HI, "hi"},
 	{ MIPS_REG_LO, "lo"},
-	{ MIPS_REG_PC, "pc"},
+
+	{ MIPS_REG_P0, "p0"},
+	{ MIPS_REG_P1, "p1"},
+	{ MIPS_REG_P2, "p2"},
+
+	{ MIPS_REG_MPL0, "mpl0"},
+	{ MIPS_REG_MPL1, "mpl1"},
+	{ MIPS_REG_MPL2, "mpl2"},
 };
 #endif
 
 const char *Mips_reg_name(csh handle, unsigned int reg)
 {
 #ifndef CAPSTONE_DIET
-	if (reg >= MIPS_REG_MAX)
+	if (reg >= MIPS_REG_ENDING)
 		return NULL;
 
 	return reg_name_maps[reg].name;
@@ -814,6 +830,30 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_BC0F, MIPS_INS_BC0F,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC0FL, MIPS_INS_BC0FL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC0T, MIPS_INS_BC0T,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC0TL, MIPS_INS_BC0TL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
 		Mips_BC1EQZ, MIPS_INS_BC1EQZ,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
@@ -821,6 +861,12 @@ static insn_map insns[] = {
 	},
 	{
 		Mips_BC1F, MIPS_INS_BC1F,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC1FL, MIPS_INS_BC1FL,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
 #endif
@@ -844,6 +890,12 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_BC1TL, MIPS_INS_BC1TL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
 		Mips_BC1T_MM, MIPS_INS_BC1T,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 1, 0
@@ -856,9 +908,57 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_BC2F, MIPS_INS_BC2F,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC2FL, MIPS_INS_BC2FL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
 		Mips_BC2NEZ, MIPS_INS_BC2NEZ,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC2T, MIPS_INS_BC2T,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC2TL, MIPS_INS_BC2TL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC3F, MIPS_INS_BC3F,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC3FL, MIPS_INS_BC3FL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC3T, MIPS_INS_BC3T,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BC3TL, MIPS_INS_BC3TL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 0
 #endif
 	},
 	{
@@ -928,6 +1028,12 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_BEQL, MIPS_INS_BEQL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, 0 }, 1, 0
+#endif
+	},
+	{
 		Mips_BEQZALC, MIPS_INS_BEQZALC,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
@@ -937,6 +1043,12 @@ static insn_map insns[] = {
 		Mips_BEQZC, MIPS_INS_BEQZC,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BEQZC_MM, MIPS_INS_BEQZC,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 1, 0
 #endif
 	},
 	{
@@ -982,6 +1094,18 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_BGEZALL, MIPS_INS_BGEZALL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BGEZALS_MM, MIPS_INS_BGEZALS,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
+#endif
+	},
+	{
 		Mips_BGEZAL_MM, MIPS_INS_BGEZAL,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
@@ -991,6 +1115,12 @@ static insn_map insns[] = {
 		Mips_BGEZC, MIPS_INS_BGEZC,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BGEZL, MIPS_INS_BGEZL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, 0 }, 1, 0
 #endif
 	},
 	{
@@ -1021,6 +1151,12 @@ static insn_map insns[] = {
 		Mips_BGTZC, MIPS_INS_BGTZC,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BGTZL, MIPS_INS_BGTZL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, 0 }, 1, 0
 #endif
 	},
 	{
@@ -1162,6 +1298,12 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_BLEZL, MIPS_INS_BLEZL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, 0 }, 1, 0
+#endif
+	},
+	{
 		Mips_BLEZ_MM, MIPS_INS_BLEZ,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 1, 0
@@ -1204,6 +1346,18 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_BLTZALL, MIPS_INS_BLTZALL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BLTZALS_MM, MIPS_INS_BLTZALS,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
+#endif
+	},
+	{
 		Mips_BLTZAL_MM, MIPS_INS_BLTZAL,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
@@ -1213,6 +1367,12 @@ static insn_map insns[] = {
 		Mips_BLTZC, MIPS_INS_BLTZC,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BLTZL, MIPS_INS_BLTZL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, 0 }, 1, 0
 #endif
 	},
 	{
@@ -1312,6 +1472,12 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_BNEL, MIPS_INS_BNEL,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, 0 }, 1, 0
+#endif
+	},
+	{
 		Mips_BNEZALC, MIPS_INS_BNEZALC,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
@@ -1321,6 +1487,12 @@ static insn_map insns[] = {
 		Mips_BNEZC, MIPS_INS_BNEZC,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 0
+#endif
+	},
+	{
+		Mips_BNEZC_MM, MIPS_INS_BNEZC,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_AT, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 1, 0
 #endif
 	},
 	{
@@ -4672,13 +4844,25 @@ static insn_map insns[] = {
 #endif
 	},
 	{
-		Mips_JALR_HB, MIPS_INS_JALR,
+		Mips_JALRS_MM, MIPS_INS_JALRS,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
+#endif
+	},
+	{
+		Mips_JALR_HB, MIPS_INS_JALR_HB,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32, 0 }, 0, 1
 #endif
 	},
 	{
 		Mips_JALR_MM, MIPS_INS_JALR,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
+#endif
+	},
+	{
+		Mips_JALS_MM, MIPS_INS_JALS,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { MIPS_REG_RA, 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
 #endif
@@ -4720,13 +4904,19 @@ static insn_map insns[] = {
 #endif
 	},
 	{
-		Mips_JR_HB, MIPS_INS_JR,
+		Mips_JRADDIUSP, MIPS_INS_JRADDIUSP,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { 0 }, { MIPS_GRP_MICROMIPS, 0 }, 1, 1
+#endif
+	},
+	{
+		Mips_JR_HB, MIPS_INS_JR_HB,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32, MIPS_GRP_NOTMIPS32R6, MIPS_GRP_NOTMIPS64R6, 0 }, 1, 1
 #endif
 	},
 	{
-		Mips_JR_HB_R6, MIPS_INS_JR,
+		Mips_JR_HB_R6, MIPS_INS_JR_HB,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS32R6, 0 }, 1, 1
 #endif
@@ -8652,7 +8842,7 @@ static insn_map insns[] = {
 	{
 		Mips_TEQ, MIPS_INS_TEQ,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
+		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS2, 0 }, 0, 0
 #endif
 	},
 	{
@@ -8676,7 +8866,7 @@ static insn_map insns[] = {
 	{
 		Mips_TGE, MIPS_INS_TGE,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
+		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS2, 0 }, 0, 0
 #endif
 	},
 	{
@@ -8706,7 +8896,7 @@ static insn_map insns[] = {
 	{
 		Mips_TGEU, MIPS_INS_TGEU,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
+		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS2, 0 }, 0, 0
 #endif
 	},
 	{
@@ -8728,9 +8918,21 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_TLBP_MM, MIPS_INS_TLBP,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
+#endif
+	},
+	{
 		Mips_TLBR, MIPS_INS_TLBR,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
+#endif
+	},
+	{
+		Mips_TLBR_MM, MIPS_INS_TLBR,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
 #endif
 	},
 	{
@@ -8740,15 +8942,27 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		Mips_TLBWI_MM, MIPS_INS_TLBWI,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
+#endif
+	},
+	{
 		Mips_TLBWR, MIPS_INS_TLBWR,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
 #endif
 	},
 	{
+		Mips_TLBWR_MM, MIPS_INS_TLBWR,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { 0 }, { MIPS_GRP_MICROMIPS, 0 }, 0, 0
+#endif
+	},
+	{
 		Mips_TLT, MIPS_INS_TLT,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
+		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS2, 0 }, 0, 0
 #endif
 	},
 	{
@@ -8772,7 +8986,7 @@ static insn_map insns[] = {
 	{
 		Mips_TLTU, MIPS_INS_TLTU,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
+		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS2, 0 }, 0, 0
 #endif
 	},
 	{
@@ -8790,7 +9004,7 @@ static insn_map insns[] = {
 	{
 		Mips_TNE, MIPS_INS_TNE,
 #ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
+		{ 0 }, { 0 }, { MIPS_GRP_STDENC, MIPS_GRP_MIPS2, 0 }, 0, 0
 #endif
 	},
 	{
@@ -8999,53 +9213,10 @@ static insn_map insns[] = {
 	},
 };
 
-static insn_map alias_insns[] = {
-	{
-		(unsigned short)-2, MIPS_INS_NOP,
-#ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { 0 }, 0, 0
-#endif
-	},
-	{
-		Mips_SUBu, MIPS_INS_NEGU,
-#ifndef CAPSTONE_DIET
-		{ 0 }, { 0 }, { MIPS_GRP_STDENC, 0 }, 0, 0
-#endif
-	},
-};
-
 // given internal insn id, return public instruction info
 void Mips_get_insn_id(cs_struct *h, cs_insn *insn, unsigned int id)
 {
 	unsigned int i;
-
-	// consider alias insn first
-	for (i = 0; i < ARR_SIZE(alias_insns); i++) {
-		if (alias_insns[i].id == id) {
-			insn->id = alias_insns[i].mapid;
-
-			if (h->detail) {
-#ifndef CAPSTONE_DIET
-				memcpy(insn->detail->regs_read, alias_insns[i].regs_use, sizeof(alias_insns[i].regs_use));
-				insn->detail->regs_read_count = (uint8_t)count_positive(alias_insns[i].regs_use);
-
-				memcpy(insn->detail->regs_write, alias_insns[i].regs_mod, sizeof(alias_insns[i].regs_mod));
-				insn->detail->regs_write_count = (uint8_t)count_positive(alias_insns[i].regs_mod);
-
-				memcpy(insn->detail->groups, alias_insns[i].groups, sizeof(alias_insns[i].groups));
-				insn->detail->groups_count = (uint8_t)count_positive(alias_insns[i].groups);
-
-				if (alias_insns[i].branch || alias_insns[i].indirect_branch) {
-					// this insn also belongs to JUMP group. add JUMP group
-					insn->detail->groups[insn->detail->groups_count] = MIPS_GRP_JUMP;
-					insn->detail->groups_count++;
-				}
-
-#endif
-			}
-			return;
-		}
-	}
 
 	i = insn_find(insns, ARR_SIZE(insns), id, &h->insn_cache);
 	if (i != 0) {
@@ -9114,16 +9285,31 @@ static name_map insn_name_maps[] = {
 	{ MIPS_INS_BALC, "balc" },
 	{ MIPS_INS_BALIGN, "balign" },
 	{ MIPS_INS_BC, "bc" },
+	{ MIPS_INS_BC0F, "bc0f" },
+	{ MIPS_INS_BC0FL, "bc0fl" },
+	{ MIPS_INS_BC0T, "bc0t" },
+	{ MIPS_INS_BC0TL, "bc0tl" },
 	{ MIPS_INS_BC1EQZ, "bc1eqz" },
 	{ MIPS_INS_BC1F, "bc1f" },
+	{ MIPS_INS_BC1FL, "bc1fl" },
 	{ MIPS_INS_BC1NEZ, "bc1nez" },
 	{ MIPS_INS_BC1T, "bc1t" },
+	{ MIPS_INS_BC1TL, "bc1tl" },
 	{ MIPS_INS_BC2EQZ, "bc2eqz" },
+	{ MIPS_INS_BC2F, "bc2f" },
+	{ MIPS_INS_BC2FL, "bc2fl" },
 	{ MIPS_INS_BC2NEZ, "bc2nez" },
+	{ MIPS_INS_BC2T, "bc2t" },
+	{ MIPS_INS_BC2TL, "bc2tl" },
+	{ MIPS_INS_BC3F, "bc3f" },
+	{ MIPS_INS_BC3FL, "bc3fl" },
+	{ MIPS_INS_BC3T, "bc3t" },
+	{ MIPS_INS_BC3TL, "bc3tl" },
 	{ MIPS_INS_BCLRI, "bclri" },
 	{ MIPS_INS_BCLR, "bclr" },
 	{ MIPS_INS_BEQ, "beq" },
 	{ MIPS_INS_BEQC, "beqc" },
+	{ MIPS_INS_BEQL, "beql" },
 	{ MIPS_INS_BEQZALC, "beqzalc" },
 	{ MIPS_INS_BEQZC, "beqzc" },
 	{ MIPS_INS_BGEC, "bgec" },
@@ -9131,10 +9317,14 @@ static name_map insn_name_maps[] = {
 	{ MIPS_INS_BGEZ, "bgez" },
 	{ MIPS_INS_BGEZAL, "bgezal" },
 	{ MIPS_INS_BGEZALC, "bgezalc" },
+	{ MIPS_INS_BGEZALL, "bgezall" },
+	{ MIPS_INS_BGEZALS, "bgezals" },
 	{ MIPS_INS_BGEZC, "bgezc" },
+	{ MIPS_INS_BGEZL, "bgezl" },
 	{ MIPS_INS_BGTZ, "bgtz" },
 	{ MIPS_INS_BGTZALC, "bgtzalc" },
 	{ MIPS_INS_BGTZC, "bgtzc" },
+	{ MIPS_INS_BGTZL, "bgtzl" },
 	{ MIPS_INS_BINSLI, "binsli" },
 	{ MIPS_INS_BINSL, "binsl" },
 	{ MIPS_INS_BINSRI, "binsri" },
@@ -9144,12 +9334,16 @@ static name_map insn_name_maps[] = {
 	{ MIPS_INS_BLEZ, "blez" },
 	{ MIPS_INS_BLEZALC, "blezalc" },
 	{ MIPS_INS_BLEZC, "blezc" },
+	{ MIPS_INS_BLEZL, "blezl" },
 	{ MIPS_INS_BLTC, "bltc" },
 	{ MIPS_INS_BLTUC, "bltuc" },
 	{ MIPS_INS_BLTZ, "bltz" },
 	{ MIPS_INS_BLTZAL, "bltzal" },
 	{ MIPS_INS_BLTZALC, "bltzalc" },
+	{ MIPS_INS_BLTZALL, "bltzall" },
+	{ MIPS_INS_BLTZALS, "bltzals" },
 	{ MIPS_INS_BLTZC, "bltzc" },
+	{ MIPS_INS_BLTZL, "bltzl" },
 	{ MIPS_INS_BMNZI, "bmnzi" },
 	{ MIPS_INS_BMNZ, "bmnz" },
 	{ MIPS_INS_BMZI, "bmzi" },
@@ -9158,6 +9352,7 @@ static name_map insn_name_maps[] = {
 	{ MIPS_INS_BNEC, "bnec" },
 	{ MIPS_INS_BNEGI, "bnegi" },
 	{ MIPS_INS_BNEG, "bneg" },
+	{ MIPS_INS_BNEL, "bnel" },
 	{ MIPS_INS_BNEZALC, "bnezalc" },
 	{ MIPS_INS_BNEZC, "bnezc" },
 	{ MIPS_INS_BNVC, "bnvc" },
@@ -9374,10 +9569,13 @@ static name_map insn_name_maps[] = {
 	{ MIPS_INS_J, "j" },
 	{ MIPS_INS_JAL, "jal" },
 	{ MIPS_INS_JALR, "jalr" },
+	{ MIPS_INS_JALRS, "jalrs" },
+	{ MIPS_INS_JALS, "jals" },
 	{ MIPS_INS_JALX, "jalx" },
 	{ MIPS_INS_JIALC, "jialc" },
 	{ MIPS_INS_JIC, "jic" },
 	{ MIPS_INS_JR, "jr" },
+	{ MIPS_INS_JRADDIUSP, "jraddiusp" },
 	{ MIPS_INS_JRC, "jrc" },
 	{ MIPS_INS_JALRC, "jalrc" },
 	{ MIPS_INS_LB, "lb" },
@@ -9633,31 +9831,16 @@ static name_map insn_name_maps[] = {
 	// alias instructions
 	{ MIPS_INS_NOP, "nop" },
 	{ MIPS_INS_NEGU, "negu" },
-};
 
-// special alias insn
-static name_map alias_insn_names[] = {
-	{ MIPS_INS_NOP, "nop" },
-	{ MIPS_INS_BEQ, "beqz" },
-	{ MIPS_INS_BGEZAL, "bal" },
-	{ MIPS_INS_BC1T, "bc1t" },
-	{ MIPS_INS_BC1F, "bc1f" },
-	{ MIPS_INS_NEGU, "negu" },
+	{ MIPS_INS_JALR_HB, "jalr.hb" },
+	{ MIPS_INS_JR_HB, "jr.hb" },
 };
 
 const char *Mips_insn_name(csh handle, unsigned int id)
 {
 #ifndef CAPSTONE_DIET
-	unsigned int i;
-
-	if (id >= MIPS_INS_MAXIMUM)
+	if (id >= MIPS_INS_ENDING)
 		return NULL;
-
-	// handle special alias first
-	for (i = 0; i < ARR_SIZE(alias_insn_names); i++) {
-		if (alias_insn_names[i].id == id)
-			return alias_insn_names[i].name;
-	}
 
 	return insn_name_maps[id].name;
 #else
@@ -9667,7 +9850,11 @@ const char *Mips_insn_name(csh handle, unsigned int id)
 
 #ifndef CAPSTONE_DIET
 static name_map group_name_maps[] = {
+	// generic groups
 	{ MIPS_GRP_INVALID, NULL },
+	{ MIPS_GRP_JUMP, "jump" },
+
+	// architecture-specific groups
 	{ MIPS_GRP_BITCOUNT, "bitcount" },
 	{ MIPS_GRP_DSP, "dsp" },
 	{ MIPS_GRP_DSPR2, "dspr2" },
@@ -9706,32 +9893,31 @@ static name_map group_name_maps[] = {
 
 	{ MIPS_GRP_GP32BIT, "gp32bit" },
 	{ MIPS_GRP_GP64BIT, "gp64bit" },
-
-	{ MIPS_GRP_JUMP, "jump" }
 };
 #endif
 
 const char *Mips_group_name(csh handle, unsigned int id)
 {
 #ifndef CAPSTONE_DIET
-	if (id >= MIPS_GRP_MAX)
+	// verify group id
+	if (id >= MIPS_GRP_ENDING || (id > MIPS_GRP_JUMP && id < MIPS_GRP_BITCOUNT))
 		return NULL;
 
-	return group_name_maps[id].name;
+	// NOTE: when new generic groups are added, 2 must be changed accordingly
+	if (id >= 128)
+		return group_name_maps[id - 128 + 2].name;
+	else
+		return group_name_maps[id].name;
 #else
 	return NULL;
 #endif
 }
 
+// map instruction name to public instruction ID
 mips_reg Mips_map_insn(const char *name)
 {
 	// handle special alias first
 	unsigned int i;
-
-	for (i = 0; i < ARR_SIZE(alias_insn_names); i++) {
-		if (!strcmp(alias_insn_names[i].name, name))
-			return alias_insn_names[i].id;
-	}
 
 	// NOTE: skip first NULL name in insn_name_maps
 	i = name2id(&insn_name_maps[1], ARR_SIZE(insn_name_maps) - 1, name);
@@ -9749,81 +9935,84 @@ mips_reg Mips_map_register(unsigned int r)
 		MIPS_REG_AT, MIPS_REG_DSPCCOND, MIPS_REG_DSPCARRY, MIPS_REG_DSPEFI, MIPS_REG_DSPOUTFLAG,
 		MIPS_REG_DSPPOS, MIPS_REG_DSPSCOUNT, MIPS_REG_FP, MIPS_REG_GP, MIPS_REG_2,
 		MIPS_REG_1, MIPS_REG_0, MIPS_REG_6, MIPS_REG_4, MIPS_REG_5,
-		MIPS_REG_3, MIPS_REG_7, MIPS_REG_PC, MIPS_REG_RA, MIPS_REG_SP,
+		MIPS_REG_3, MIPS_REG_7, 0, MIPS_REG_RA, MIPS_REG_SP,
 		MIPS_REG_ZERO, MIPS_REG_A0, MIPS_REG_A1, MIPS_REG_A2, MIPS_REG_A3,
 		MIPS_REG_AC0, MIPS_REG_AC1, MIPS_REG_AC2, MIPS_REG_AC3, MIPS_REG_AT,
-		MIPS_REG_0, MIPS_REG_1, MIPS_REG_2, MIPS_REG_3, MIPS_REG_4,
-		MIPS_REG_5, MIPS_REG_6, MIPS_REG_7, MIPS_REG_8, MIPS_REG_9,
-		MIPS_REG_0, MIPS_REG_1, MIPS_REG_2, MIPS_REG_3, MIPS_REG_4,
-		MIPS_REG_5, MIPS_REG_6, MIPS_REG_7, MIPS_REG_8, MIPS_REG_9,
+		MIPS_REG_CC0, MIPS_REG_CC1, MIPS_REG_CC2, MIPS_REG_CC3, MIPS_REG_CC4,
+		MIPS_REG_CC5, MIPS_REG_CC6, MIPS_REG_CC7, MIPS_REG_0, MIPS_REG_1,
+		MIPS_REG_2, MIPS_REG_3, MIPS_REG_4, MIPS_REG_5, MIPS_REG_6,
+		MIPS_REG_7, MIPS_REG_8, MIPS_REG_9, MIPS_REG_0, MIPS_REG_1,
+		MIPS_REG_2, MIPS_REG_3, MIPS_REG_4, MIPS_REG_5, MIPS_REG_6,
+		MIPS_REG_7, MIPS_REG_8, MIPS_REG_9, MIPS_REG_10, MIPS_REG_11,
+		MIPS_REG_12, MIPS_REG_13, MIPS_REG_14, MIPS_REG_15, MIPS_REG_16,
+		MIPS_REG_17, MIPS_REG_18, MIPS_REG_19, MIPS_REG_20, MIPS_REG_21,
+		MIPS_REG_22, MIPS_REG_23, MIPS_REG_24, MIPS_REG_25, MIPS_REG_26,
+		MIPS_REG_27, MIPS_REG_28, MIPS_REG_29, MIPS_REG_30, MIPS_REG_31,
 		MIPS_REG_10, MIPS_REG_11, MIPS_REG_12, MIPS_REG_13, MIPS_REG_14,
 		MIPS_REG_15, MIPS_REG_16, MIPS_REG_17, MIPS_REG_18, MIPS_REG_19,
 		MIPS_REG_20, MIPS_REG_21, MIPS_REG_22, MIPS_REG_23, MIPS_REG_24,
 		MIPS_REG_25, MIPS_REG_26, MIPS_REG_27, MIPS_REG_28, MIPS_REG_29,
-		MIPS_REG_30, MIPS_REG_31, MIPS_REG_10, MIPS_REG_11, MIPS_REG_12,
-		MIPS_REG_13, MIPS_REG_14, MIPS_REG_15, MIPS_REG_16, MIPS_REG_17,
-		MIPS_REG_18, MIPS_REG_19, MIPS_REG_20, MIPS_REG_21, MIPS_REG_22,
-		MIPS_REG_23, MIPS_REG_24, MIPS_REG_25, MIPS_REG_26, MIPS_REG_27,
-		MIPS_REG_28, MIPS_REG_29, MIPS_REG_30, MIPS_REG_31, MIPS_REG_F0,
-		MIPS_REG_F2, MIPS_REG_F4, MIPS_REG_F6, MIPS_REG_F8, MIPS_REG_F10,
-		MIPS_REG_F12, MIPS_REG_F14, MIPS_REG_F16, MIPS_REG_F18, MIPS_REG_F20,
-		MIPS_REG_F22, MIPS_REG_F24, MIPS_REG_F26, MIPS_REG_F28, MIPS_REG_F30,
-		MIPS_REG_DSPOUTFLAG20, MIPS_REG_DSPOUTFLAG21, MIPS_REG_DSPOUTFLAG22, MIPS_REG_DSPOUTFLAG23,
-		MIPS_REG_F0, MIPS_REG_F1, MIPS_REG_F2, MIPS_REG_F3, MIPS_REG_F4, MIPS_REG_F5,
-		MIPS_REG_F6, MIPS_REG_F7, MIPS_REG_F8, MIPS_REG_F9, MIPS_REG_F10,
-		MIPS_REG_F11, MIPS_REG_F12, MIPS_REG_F13, MIPS_REG_F14, MIPS_REG_F15,
-		MIPS_REG_F16, MIPS_REG_F17, MIPS_REG_F18, MIPS_REG_F19, MIPS_REG_F20,
-		MIPS_REG_F21, MIPS_REG_F22, MIPS_REG_F23, MIPS_REG_F24, MIPS_REG_F25,
-		MIPS_REG_F26, MIPS_REG_F27, MIPS_REG_F28, MIPS_REG_F29, MIPS_REG_F30,
-		MIPS_REG_F31, MIPS_REG_FCC0, MIPS_REG_FCC1, MIPS_REG_FCC2, MIPS_REG_FCC3,
-		MIPS_REG_FCC4, MIPS_REG_FCC5, MIPS_REG_FCC6, MIPS_REG_FCC7, MIPS_REG_0,
-		MIPS_REG_1, MIPS_REG_2, MIPS_REG_3, MIPS_REG_4, MIPS_REG_5,
-		MIPS_REG_6, MIPS_REG_7, MIPS_REG_8, MIPS_REG_9, MIPS_REG_10,
-		MIPS_REG_11, MIPS_REG_12, MIPS_REG_13, MIPS_REG_14, MIPS_REG_15,
-		MIPS_REG_16, MIPS_REG_17, MIPS_REG_18, MIPS_REG_19, MIPS_REG_20,
-		MIPS_REG_21, MIPS_REG_22, MIPS_REG_23, MIPS_REG_24, MIPS_REG_25,
-		MIPS_REG_26, MIPS_REG_27, MIPS_REG_28, MIPS_REG_29, MIPS_REG_30,
-		MIPS_REG_31, MIPS_REG_FP, MIPS_REG_F0, MIPS_REG_F1, MIPS_REG_F2,
+		MIPS_REG_30, MIPS_REG_31, MIPS_REG_F0, MIPS_REG_F2, MIPS_REG_F4,
+		MIPS_REG_F6, MIPS_REG_F8, MIPS_REG_F10, MIPS_REG_F12, MIPS_REG_F14,
+		MIPS_REG_F16, MIPS_REG_F18, MIPS_REG_F20, MIPS_REG_F22, MIPS_REG_F24,
+		MIPS_REG_F26, MIPS_REG_F28, MIPS_REG_F30, MIPS_REG_DSPOUTFLAG20, MIPS_REG_DSPOUTFLAG21,
+		MIPS_REG_DSPOUTFLAG22, MIPS_REG_DSPOUTFLAG23, MIPS_REG_F0, MIPS_REG_F1, MIPS_REG_F2,
 		MIPS_REG_F3, MIPS_REG_F4, MIPS_REG_F5, MIPS_REG_F6, MIPS_REG_F7,
 		MIPS_REG_F8, MIPS_REG_F9, MIPS_REG_F10, MIPS_REG_F11, MIPS_REG_F12,
 		MIPS_REG_F13, MIPS_REG_F14, MIPS_REG_F15, MIPS_REG_F16, MIPS_REG_F17,
 		MIPS_REG_F18, MIPS_REG_F19, MIPS_REG_F20, MIPS_REG_F21, MIPS_REG_F22,
 		MIPS_REG_F23, MIPS_REG_F24, MIPS_REG_F25, MIPS_REG_F26, MIPS_REG_F27,
-		MIPS_REG_F28, MIPS_REG_F29, MIPS_REG_F30, MIPS_REG_F31, MIPS_REG_GP,
-		MIPS_REG_AC0, MIPS_REG_AC1, MIPS_REG_AC2, MIPS_REG_AC3, MIPS_REG_0,
-		MIPS_REG_1, MIPS_REG_2, MIPS_REG_3, MIPS_REG_4, MIPS_REG_5,
-		MIPS_REG_6, MIPS_REG_7, MIPS_REG_8, MIPS_REG_9, MIPS_REG_10,
-		MIPS_REG_11, MIPS_REG_12, MIPS_REG_13, MIPS_REG_14, MIPS_REG_15,
-		MIPS_REG_16, MIPS_REG_17, MIPS_REG_18, MIPS_REG_19, MIPS_REG_20,
-		MIPS_REG_21, MIPS_REG_22, MIPS_REG_23, MIPS_REG_24, MIPS_REG_25,
-		MIPS_REG_26, MIPS_REG_27, MIPS_REG_28, MIPS_REG_29, MIPS_REG_30,
-		MIPS_REG_31, MIPS_REG_K0, MIPS_REG_K1, MIPS_REG_AC0, MIPS_REG_AC1,
-		MIPS_REG_AC2, MIPS_REG_AC3, MIPS_REG_MPL0, MIPS_REG_MPL1, MIPS_REG_MPL2,
-		MIPS_REG_P0, MIPS_REG_P1, MIPS_REG_P2, MIPS_REG_RA, MIPS_REG_S0,
-		MIPS_REG_S1, MIPS_REG_S2, MIPS_REG_S3, MIPS_REG_S4, MIPS_REG_S5,
-		MIPS_REG_S6, MIPS_REG_S7, MIPS_REG_SP, MIPS_REG_T0, MIPS_REG_T1,
-		MIPS_REG_T2, MIPS_REG_T3, MIPS_REG_T4, MIPS_REG_T5, MIPS_REG_T6,
-		MIPS_REG_T7, MIPS_REG_T8, MIPS_REG_T9, MIPS_REG_V0, MIPS_REG_V1,
-		MIPS_REG_W0, MIPS_REG_W1, MIPS_REG_W2, MIPS_REG_W3, MIPS_REG_W4,
-		MIPS_REG_W5, MIPS_REG_W6, MIPS_REG_W7, MIPS_REG_W8, MIPS_REG_W9,
-		MIPS_REG_W10, MIPS_REG_W11, MIPS_REG_W12, MIPS_REG_W13, MIPS_REG_W14,
-		MIPS_REG_W15, MIPS_REG_W16, MIPS_REG_W17, MIPS_REG_W18, MIPS_REG_W19,
-		MIPS_REG_W20, MIPS_REG_W21, MIPS_REG_W22, MIPS_REG_W23, MIPS_REG_W24,
-		MIPS_REG_W25, MIPS_REG_W26, MIPS_REG_W27, MIPS_REG_W28, MIPS_REG_W29,
-		MIPS_REG_W30, MIPS_REG_W31, MIPS_REG_ZERO, MIPS_REG_A0, MIPS_REG_A1,
-		MIPS_REG_A2, MIPS_REG_A3, MIPS_REG_AC0, MIPS_REG_F0, MIPS_REG_F1,
-		MIPS_REG_F2, MIPS_REG_F3, MIPS_REG_F4, MIPS_REG_F5, MIPS_REG_F6,
-		MIPS_REG_F7, MIPS_REG_F8, MIPS_REG_F9, MIPS_REG_F10, MIPS_REG_F11,
-		MIPS_REG_F12, MIPS_REG_F13, MIPS_REG_F14, MIPS_REG_F15, MIPS_REG_F16,
-		MIPS_REG_F17, MIPS_REG_F18, MIPS_REG_F19, MIPS_REG_F20, MIPS_REG_F21,
-		MIPS_REG_F22, MIPS_REG_F23, MIPS_REG_F24, MIPS_REG_F25, MIPS_REG_F26,
-		MIPS_REG_F27, MIPS_REG_F28, MIPS_REG_F29, MIPS_REG_F30, MIPS_REG_F31,
-		MIPS_REG_DSPOUTFLAG16_19, MIPS_REG_HI, MIPS_REG_K0, MIPS_REG_K1, MIPS_REG_LO,
-		MIPS_REG_S0, MIPS_REG_S1, MIPS_REG_S2, MIPS_REG_S3, MIPS_REG_S4,
-		MIPS_REG_S5, MIPS_REG_S6, MIPS_REG_S7, MIPS_REG_T0, MIPS_REG_T1,
-		MIPS_REG_T2, MIPS_REG_T3, MIPS_REG_T4, MIPS_REG_T5, MIPS_REG_T6,
-		MIPS_REG_T7, MIPS_REG_T8, MIPS_REG_T9, MIPS_REG_V0, MIPS_REG_V1,
+		MIPS_REG_F28, MIPS_REG_F29, MIPS_REG_F30, MIPS_REG_F31, MIPS_REG_FCC0,
+		MIPS_REG_FCC1, MIPS_REG_FCC2, MIPS_REG_FCC3, MIPS_REG_FCC4, MIPS_REG_FCC5,
+		MIPS_REG_FCC6, MIPS_REG_FCC7, MIPS_REG_0, MIPS_REG_1, MIPS_REG_2,
+		MIPS_REG_3, MIPS_REG_4, MIPS_REG_5, MIPS_REG_6, MIPS_REG_7,
+		MIPS_REG_8, MIPS_REG_9, MIPS_REG_10, MIPS_REG_11, MIPS_REG_12,
+		MIPS_REG_13, MIPS_REG_14, MIPS_REG_15, MIPS_REG_16, MIPS_REG_17,
+		MIPS_REG_18, MIPS_REG_19, MIPS_REG_20, MIPS_REG_21, MIPS_REG_22,
+		MIPS_REG_23, MIPS_REG_24, MIPS_REG_25, MIPS_REG_26, MIPS_REG_27,
+		MIPS_REG_28, MIPS_REG_29, MIPS_REG_30, MIPS_REG_31, MIPS_REG_FP,
+		MIPS_REG_F0, MIPS_REG_F1, MIPS_REG_F2, MIPS_REG_F3, MIPS_REG_F4,
+		MIPS_REG_F5, MIPS_REG_F6, MIPS_REG_F7, MIPS_REG_F8, MIPS_REG_F9,
+		MIPS_REG_F10, MIPS_REG_F11, MIPS_REG_F12, MIPS_REG_F13, MIPS_REG_F14,
+		MIPS_REG_F15, MIPS_REG_F16, MIPS_REG_F17, MIPS_REG_F18, MIPS_REG_F19,
+		MIPS_REG_F20, MIPS_REG_F21, MIPS_REG_F22, MIPS_REG_F23, MIPS_REG_F24,
+		MIPS_REG_F25, MIPS_REG_F26, MIPS_REG_F27, MIPS_REG_F28, MIPS_REG_F29,
+		MIPS_REG_F30, MIPS_REG_F31, MIPS_REG_GP, MIPS_REG_AC0, MIPS_REG_AC1,
+		MIPS_REG_AC2, MIPS_REG_AC3, MIPS_REG_0, MIPS_REG_1, MIPS_REG_2,
+		MIPS_REG_3, MIPS_REG_4, MIPS_REG_5, MIPS_REG_6, MIPS_REG_7,
+		MIPS_REG_8, MIPS_REG_9, MIPS_REG_10, MIPS_REG_11, MIPS_REG_12,
+		MIPS_REG_13, MIPS_REG_14, MIPS_REG_15, MIPS_REG_16, MIPS_REG_17,
+		MIPS_REG_18, MIPS_REG_19, MIPS_REG_20, MIPS_REG_21, MIPS_REG_22,
+		MIPS_REG_23, MIPS_REG_24, MIPS_REG_25, MIPS_REG_26, MIPS_REG_27,
+		MIPS_REG_28, MIPS_REG_29, MIPS_REG_30, MIPS_REG_31, MIPS_REG_K0,
+		MIPS_REG_K1, MIPS_REG_AC0, MIPS_REG_AC1, MIPS_REG_AC2, MIPS_REG_AC3,
+		MIPS_REG_MPL0, MIPS_REG_MPL1, MIPS_REG_MPL2, MIPS_REG_P0, MIPS_REG_P1,
+		MIPS_REG_P2, MIPS_REG_RA, MIPS_REG_S0, MIPS_REG_S1, MIPS_REG_S2,
+		MIPS_REG_S3, MIPS_REG_S4, MIPS_REG_S5, MIPS_REG_S6, MIPS_REG_S7,
+		MIPS_REG_SP, MIPS_REG_T0, MIPS_REG_T1, MIPS_REG_T2, MIPS_REG_T3,
+		MIPS_REG_T4, MIPS_REG_T5, MIPS_REG_T6, MIPS_REG_T7, MIPS_REG_T8,
+		MIPS_REG_T9, MIPS_REG_V0, MIPS_REG_V1, MIPS_REG_W0, MIPS_REG_W1,
+		MIPS_REG_W2, MIPS_REG_W3, MIPS_REG_W4, MIPS_REG_W5, MIPS_REG_W6,
+		MIPS_REG_W7, MIPS_REG_W8, MIPS_REG_W9, MIPS_REG_W10, MIPS_REG_W11,
+		MIPS_REG_W12, MIPS_REG_W13, MIPS_REG_W14, MIPS_REG_W15, MIPS_REG_W16,
+		MIPS_REG_W17, MIPS_REG_W18, MIPS_REG_W19, MIPS_REG_W20, MIPS_REG_W21,
+		MIPS_REG_W22, MIPS_REG_W23, MIPS_REG_W24, MIPS_REG_W25, MIPS_REG_W26,
+		MIPS_REG_W27, MIPS_REG_W28, MIPS_REG_W29, MIPS_REG_W30, MIPS_REG_W31,
+		MIPS_REG_ZERO, MIPS_REG_A0, MIPS_REG_A1, MIPS_REG_A2, MIPS_REG_A3,
+		MIPS_REG_AC0, MIPS_REG_F0, MIPS_REG_F1, MIPS_REG_F2, MIPS_REG_F3,
+		MIPS_REG_F4, MIPS_REG_F5, MIPS_REG_F6, MIPS_REG_F7, MIPS_REG_F8,
+		MIPS_REG_F9, MIPS_REG_F10, MIPS_REG_F11, MIPS_REG_F12, MIPS_REG_F13,
+		MIPS_REG_F14, MIPS_REG_F15, MIPS_REG_F16, MIPS_REG_F17, MIPS_REG_F18,
+		MIPS_REG_F19, MIPS_REG_F20, MIPS_REG_F21, MIPS_REG_F22, MIPS_REG_F23,
+		MIPS_REG_F24, MIPS_REG_F25, MIPS_REG_F26, MIPS_REG_F27, MIPS_REG_F28,
+		MIPS_REG_F29, MIPS_REG_F30, MIPS_REG_F31, MIPS_REG_DSPOUTFLAG16_19, MIPS_REG_HI,
+		MIPS_REG_K0, MIPS_REG_K1, MIPS_REG_LO, MIPS_REG_S0, MIPS_REG_S1,
+		MIPS_REG_S2, MIPS_REG_S3, MIPS_REG_S4, MIPS_REG_S5, MIPS_REG_S6,
+		MIPS_REG_S7, MIPS_REG_T0, MIPS_REG_T1, MIPS_REG_T2, MIPS_REG_T3,
+		MIPS_REG_T4, MIPS_REG_T5, MIPS_REG_T6, MIPS_REG_T7, MIPS_REG_T8,
+		MIPS_REG_T9, MIPS_REG_V0, MIPS_REG_V1,
 	};
+
 	if (r < ARR_SIZE(map))
 		return map[r];
 

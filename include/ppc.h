@@ -26,22 +26,10 @@ typedef enum ppc_bc {
 	PPC_BC_NE       = (2 << 5) |  4,
 	PPC_BC_UN       = (3 << 5) | 12,
 	PPC_BC_NU       = (3 << 5) |  4,
-	PPC_BC_LT_MINUS = (0 << 5) | 14,
-	PPC_BC_LE_MINUS = (1 << 5) |  6,
-	PPC_BC_EQ_MINUS = (2 << 5) | 14,
-	PPC_BC_GE_MINUS = (0 << 5) |  6,
-	PPC_BC_GT_MINUS = (1 << 5) | 14,
-	PPC_BC_NE_MINUS = (2 << 5) |  6,
-	PPC_BC_UN_MINUS = (3 << 5) | 14,
-	PPC_BC_NU_MINUS = (3 << 5) |  6,
-	PPC_BC_LT_PLUS  = (0 << 5) | 15,
-	PPC_BC_LE_PLUS  = (1 << 5) |  7,
-	PPC_BC_EQ_PLUS  = (2 << 5) | 15,
-	PPC_BC_GE_PLUS  = (0 << 5) |  7,
-	PPC_BC_GT_PLUS  = (1 << 5) | 15,
-	PPC_BC_NE_PLUS  = (2 << 5) |  7,
-	PPC_BC_UN_PLUS  = (3 << 5) | 15,
-	PPC_BC_NU_PLUS  = (3 << 5) |  7
+
+	// extra conditions
+	PPC_BC_SO = (4 << 5) | 12,	// summary overflow
+	PPC_BC_NS = (4 << 5) | 4,	// not summary overflow
 } ppc_bc;
 
 //> PPC branch hint for some branch instructions
@@ -50,48 +38,6 @@ typedef enum ppc_bh {
 	PPC_BH_PLUS,	// PLUS hint
 	PPC_BH_MINUS,	// MINUS hint
 } ppc_bh;
-
-//> Operand type for instruction's operands
-typedef enum ppc_op_type {
-	PPC_OP_INVALID = 0,	// Uninitialized.
-	PPC_OP_REG,	// Register operand.
-	PPC_OP_IMM,	// Immediate operand.
-	PPC_OP_MEM,	// Memory operand
-} ppc_op_type;
-
-// Instruction's operand referring to memory
-// This is associated with PPC_OP_MEM operand type above
-typedef struct ppc_op_mem {
-	unsigned int base;	// base register
-	int32_t disp;	// displacement/offset value
-} ppc_op_mem;
-
-// Instruction operand
-typedef struct cs_ppc_op {
-	ppc_op_type type;	// operand type
-	union {
-		unsigned int reg;	// register value for REG operand
-		int32_t imm;		// immediate value for IMM operand
-		ppc_op_mem mem;		// base/disp value for MEM operand
-	};
-} cs_ppc_op;
-
-// Instruction structure
-typedef struct cs_ppc {
-	// branch code for branch instructions
-	ppc_bc bc;
-
-	// branch hint for branch instructions
-	ppc_bh bh;
-
-	// if update_cr0 = True, then this 'dot' insn updates CR0
-	bool update_cr0;
-
-	// Number of operands of this instruction, 
-	// or 0 when instruction has no operand.
-	uint8_t op_count;
-	cs_ppc_op operands[8]; // operands for this instruction.
-} cs_ppc;
 
 //> PPC registers
 typedef enum ppc_reg {
@@ -277,8 +223,59 @@ typedef enum ppc_reg {
 	PPC_REG_LR8,
 	PPC_REG_CR1EQ,
 
-	PPC_REG_MAX,   // <-- mark the end of the list of registers
+	PPC_REG_ENDING,   // <-- mark the end of the list of registers
 } ppc_reg;
+
+//> Operand type for instruction's operands
+typedef enum ppc_op_type {
+	PPC_OP_INVALID = 0, // = CS_OP_INVALID (Uninitialized).
+	PPC_OP_REG, // = CS_OP_REG (Register operand).
+	PPC_OP_IMM, // = CS_OP_IMM (Immediate operand).
+	PPC_OP_MEM, // = CS_OP_MEM (Memory operand).
+	PPC_OP_CRX = 64,	// Condition Register field
+} ppc_op_type;
+
+// Instruction's operand referring to memory
+// This is associated with PPC_OP_MEM operand type above
+typedef struct ppc_op_mem {
+	ppc_reg base;	// base register
+	int32_t disp;	// displacement/offset value
+} ppc_op_mem;
+
+typedef struct ppc_op_crx {
+	unsigned int scale;
+	ppc_reg reg;
+	ppc_bc cond;
+} ppc_op_crx;
+
+// Instruction operand
+typedef struct cs_ppc_op {
+	ppc_op_type type;	// operand type
+	union {
+		ppc_reg reg;	// register value for REG operand
+		int32_t imm;		// immediate value for IMM operand
+		ppc_op_mem mem;		// base/disp value for MEM operand
+		ppc_op_crx crx;		// operand with condition register
+	};
+} cs_ppc_op;
+
+// Instruction structure
+typedef struct cs_ppc {
+	// branch code for branch instructions
+	ppc_bc bc;
+
+	// branch hint for branch instructions
+	ppc_bh bh;
+
+	// if update_cr0 = True, then this 'dot' insn updates CR0
+	bool update_cr0;
+
+	// Number of operands of this instruction, 
+	// or 0 when instruction has no operand.
+	uint8_t op_count;
+	cs_ppc_op operands[8]; // operands for this instruction.
+} cs_ppc;
+
 
 //> PPC instruction
 typedef enum ppc_insn {
@@ -1053,14 +1050,187 @@ typedef enum ppc_insn {
 	PPC_INS_BCA,
 	PPC_INS_BCLA,
 
-	PPC_INS_MAX,   // <-- mark the end of the list of instructions
+	// extra & alias instructions
+	PPC_INS_SLWI,
+	PPC_INS_SRWI,
+	PPC_INS_SLDI,
+
+	PPC_INS_BTA,
+	PPC_INS_CRSET,
+	PPC_INS_CRNOT,
+	PPC_INS_CRMOVE,
+	PPC_INS_CRCLR,
+	PPC_INS_MFBR0,
+	PPC_INS_MFBR1,
+	PPC_INS_MFBR2,
+	PPC_INS_MFBR3,
+	PPC_INS_MFBR4,
+	PPC_INS_MFBR5,
+	PPC_INS_MFBR6,
+	PPC_INS_MFBR7,
+	PPC_INS_MFXER,
+	PPC_INS_MFRTCU,
+	PPC_INS_MFRTCL,
+	PPC_INS_MFDSCR,
+	PPC_INS_MFDSISR,
+	PPC_INS_MFDAR,
+	PPC_INS_MFSRR2,
+	PPC_INS_MFSRR3,
+	PPC_INS_MFCFAR,
+	PPC_INS_MFAMR,
+	PPC_INS_MFPID,
+	PPC_INS_MFTBLO,
+	PPC_INS_MFTBHI,
+	PPC_INS_MFDBATU,
+	PPC_INS_MFDBATL,
+	PPC_INS_MFIBATU,
+	PPC_INS_MFIBATL,
+	PPC_INS_MFDCCR,
+	PPC_INS_MFICCR,
+	PPC_INS_MFDEAR,
+	PPC_INS_MFESR,
+	PPC_INS_MFSPEFSCR,
+	PPC_INS_MFTCR,
+	PPC_INS_MFASR,
+	PPC_INS_MFPVR,
+	PPC_INS_MFTBU,
+	PPC_INS_MTCR,
+	PPC_INS_MTBR0,
+	PPC_INS_MTBR1,
+	PPC_INS_MTBR2,
+	PPC_INS_MTBR3,
+	PPC_INS_MTBR4,
+	PPC_INS_MTBR5,
+	PPC_INS_MTBR6,
+	PPC_INS_MTBR7,
+	PPC_INS_MTXER,
+	PPC_INS_MTDSCR,
+	PPC_INS_MTDSISR,
+	PPC_INS_MTDAR,
+	PPC_INS_MTSRR2,
+	PPC_INS_MTSRR3,
+	PPC_INS_MTCFAR,
+	PPC_INS_MTAMR,
+	PPC_INS_MTPID,
+	PPC_INS_MTTBL,
+	PPC_INS_MTTBU,
+	PPC_INS_MTTBLO,
+	PPC_INS_MTTBHI,
+	PPC_INS_MTDBATU,
+	PPC_INS_MTDBATL,
+	PPC_INS_MTIBATU,
+	PPC_INS_MTIBATL,
+	PPC_INS_MTDCCR,
+	PPC_INS_MTICCR,
+	PPC_INS_MTDEAR,
+	PPC_INS_MTESR,
+	PPC_INS_MTSPEFSCR,
+	PPC_INS_MTTCR,
+	PPC_INS_NOT,
+	PPC_INS_MR,
+	PPC_INS_ROTLD,
+	PPC_INS_ROTLDI,
+	PPC_INS_CLRLDI,
+	PPC_INS_ROTLWI,
+	PPC_INS_CLRLWI,
+	PPC_INS_ROTLW,
+	PPC_INS_SUB,
+	PPC_INS_SUBC,
+	PPC_INS_LWSYNC,
+	PPC_INS_PTESYNC,
+	PPC_INS_TDLT,
+	PPC_INS_TDEQ,
+	PPC_INS_TDGT,
+	PPC_INS_TDNE,
+	PPC_INS_TDLLT,
+	PPC_INS_TDLGT,
+	PPC_INS_TDU,
+	PPC_INS_TDLTI,
+	PPC_INS_TDEQI,
+	PPC_INS_TDGTI,
+	PPC_INS_TDNEI,
+	PPC_INS_TDLLTI,
+	PPC_INS_TDLGTI,
+	PPC_INS_TDUI,
+	PPC_INS_TLBREHI,
+	PPC_INS_TLBRELO,
+	PPC_INS_TLBWEHI,
+	PPC_INS_TLBWELO,
+	PPC_INS_TWLT,
+	PPC_INS_TWEQ,
+	PPC_INS_TWGT,
+	PPC_INS_TWNE,
+	PPC_INS_TWLLT,
+	PPC_INS_TWLGT,
+	PPC_INS_TWU,
+	PPC_INS_TWLTI,
+	PPC_INS_TWEQI,
+	PPC_INS_TWGTI,
+	PPC_INS_TWNEI,
+	PPC_INS_TWLLTI,
+	PPC_INS_TWLGTI,
+	PPC_INS_TWUI,
+	PPC_INS_WAITRSV,
+	PPC_INS_WAITIMPL,
+	PPC_INS_XNOP,
+	PPC_INS_XVMOVDP,
+	PPC_INS_XVMOVSP,
+	PPC_INS_XXSPLTD,
+	PPC_INS_XXMRGHD,
+	PPC_INS_XXMRGLD,
+	PPC_INS_XXSWAPD,
+	PPC_INS_BT,
+	PPC_INS_BF,
+	PPC_INS_BDNZT,
+	PPC_INS_BDNZF,
+	PPC_INS_BDZF,
+	PPC_INS_BDZT,
+	PPC_INS_BFA,
+	PPC_INS_BDNZTA,
+	PPC_INS_BDNZFA,
+	PPC_INS_BDZTA,
+	PPC_INS_BDZFA,
+	PPC_INS_BTCTR,
+	PPC_INS_BFCTR,
+	PPC_INS_BTCTRL,
+	PPC_INS_BFCTRL,
+	PPC_INS_BTL,
+	PPC_INS_BFL,
+	PPC_INS_BDNZTL,
+	PPC_INS_BDNZFL,
+	PPC_INS_BDZTL,
+	PPC_INS_BDZFL,
+	PPC_INS_BTLA,
+	PPC_INS_BFLA,
+	PPC_INS_BDNZTLA,
+	PPC_INS_BDNZFLA,
+	PPC_INS_BDZTLA,
+	PPC_INS_BDZFLA,
+	PPC_INS_BTLR,
+	PPC_INS_BFLR,
+	PPC_INS_BDNZTLR,
+	PPC_INS_BDZTLR,
+	PPC_INS_BDZFLR,
+	PPC_INS_BTLRL,
+	PPC_INS_BFLRL,
+	PPC_INS_BDNZTLRL,
+	PPC_INS_BDNZFLRL,
+	PPC_INS_BDZTLRL,
+	PPC_INS_BDZFLRL,
+
+	PPC_INS_ENDING,   // <-- mark the end of the list of instructions
 } ppc_insn;
 
 //> Group of PPC instructions
 typedef enum ppc_insn_group {
-	PPC_GRP_INVALID = 0,
+	PPC_GRP_INVALID = 0, // = CS_GRP_INVALID
 
-	PPC_GRP_ALTIVEC,
+	//> Generic groups
+	// all jump instructions (conditional+direct+indirect jumps)
+	PPC_GRP_JUMP,	// = CS_GRP_JUMP
+
+	//> Architecture-specific groups
+	PPC_GRP_ALTIVEC = 128,
 	PPC_GRP_MODE32,
 	PPC_GRP_MODE64,
 	PPC_GRP_BOOKE,
@@ -1071,9 +1241,7 @@ typedef enum ppc_insn_group {
 	PPC_GRP_PPC4XX,
 	PPC_GRP_PPC6XX,
 
-	PPC_GRP_JUMP,	// all jump instructions (conditional+direct+indirect jumps)
-
-	PPC_GRP_MAX,   // <-- mark the end of the list of groups
+	PPC_GRP_ENDING,   // <-- mark the end of the list of groups
 } ppc_insn_group;
 
 #ifdef __cplusplus

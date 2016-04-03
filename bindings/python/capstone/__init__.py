@@ -1,9 +1,10 @@
 # Capstone Python bindings, by Nguyen Anh Quynnh <aquynh@gmail.com>
 import sys
-_python2 = sys.version_info.major < 3
+from platform import system
+_python2 = sys.version_info[0] < 3
 if _python2:
     range = xrange
-from capstone import arm, arm64, mips, ppc, sparc, systemz, x86, xcore
+from . import arm, arm64, mips, ppc, sparc, systemz, x86, xcore
 
 __all__ = [
     'Cs',
@@ -38,11 +39,13 @@ __all__ = [
     'CS_MODE_THUMB',
     'CS_MODE_MCLASS',
     'CS_MODE_MICRO',
-    'CS_MODE_N64',
     'CS_MODE_MIPS3',
     'CS_MODE_MIPS32R6',
     'CS_MODE_MIPSGP64',
+    'CS_MODE_V8',
     'CS_MODE_V9',
+    'CS_MODE_MIPS32',
+    'CS_MODE_MIPS64',
 
     'CS_OPT_SYNTAX',
     'CS_OPT_SYNTAX_DEFAULT',
@@ -67,12 +70,29 @@ __all__ = [
     'CS_ERR_MEMSETUP',
     'CS_ERR_DIET',
     'CS_ERR_SKIPDATA',
+    'CS_ERR_X86_ATT',
+    'CS_ERR_X86_INTEL',
 
     'CS_SUPPORT_DIET',
     'CS_SUPPORT_X86_REDUCE',
     'CS_SKIPDATA_CALLBACK',
 
+    'CS_OP_INVALID',
+    'CS_OP_REG',
+    'CS_OP_IMM',
+    'CS_OP_MEM',
+    'CS_OP_FP',
+
+    'CS_GRP_INVALID',
+    'CS_GRP_JUMP',
+    'CS_GRP_CALL',
+    'CS_GRP_RET',
+    'CS_GRP_INT',
+    'CS_GRP_IRET',
+
     'CsError',
+
+    '__version__',
 ]
 
 # Capstone C interface
@@ -80,6 +100,8 @@ __all__ = [
 # API version
 CS_API_MAJOR = 3
 CS_API_MINOR = 0
+
+__version__ = "%s.%s" %(CS_API_MAJOR, CS_API_MINOR)
 
 # architectures
 CS_ARCH_ARM = 0
@@ -96,18 +118,20 @@ CS_ARCH_ALL = 0xFFFF
 # disasm mode
 CS_MODE_LITTLE_ENDIAN = 0      # little-endian mode (default mode)
 CS_MODE_ARM = 0                # ARM mode
-CS_MODE_16 = (1 << 1)          # 16-bit mode (for X86, Mips)
-CS_MODE_32 = (1 << 2)          # 32-bit mode (for X86, Mips)
-CS_MODE_64 = (1 << 3)          # 64-bit mode (for X86, Mips)
+CS_MODE_16 = (1 << 1)          # 16-bit mode (for X86)
+CS_MODE_32 = (1 << 2)          # 32-bit mode (for X86)
+CS_MODE_64 = (1 << 3)          # 64-bit mode (for X86, PPC)
 CS_MODE_THUMB = (1 << 4)       # ARM's Thumb mode, including Thumb-2
 CS_MODE_MCLASS = (1 << 5)      # ARM's Cortex-M series
+CS_MODE_V8 = (1 << 6)          # ARMv8 A32 encodings for ARM
 CS_MODE_MICRO = (1 << 4)       # MicroMips mode (MIPS architecture)
-CS_MODE_N64 = (1 << 5)         # Nintendo-64 mode (MIPS architecture)
-CS_MODE_MIPS3 = 1 << 6         # Mips III ISA
-CS_MODE_MIPS32R6 = 1 << 7      # Mips32r6 ISA
-CS_MODE_MIPSGP64 = 1 << 8      # General Purpose Registers are 64-bit wide (MIPS arch)
-CS_MODE_V9 = (1 << 4)          # Nintendo-64 mode (MIPS architecture)
+CS_MODE_MIPS3 = (1 << 5)       # Mips III ISA
+CS_MODE_MIPS32R6 = (1 << 6)    # Mips32r6 ISA
+CS_MODE_MIPSGP64 = (1 << 7)    # General Purpose Registers are 64-bit wide (MIPS arch)
+CS_MODE_V9 = (1 << 4)          # Sparc V9 mode (for Sparc)
 CS_MODE_BIG_ENDIAN = (1 << 31) # big-endian mode
+CS_MODE_MIPS32 = CS_MODE_32    # Mips32 ISA
+CS_MODE_MIPS64 = CS_MODE_64    # Mips64 ISA
 
 # Capstone option type
 CS_OPT_SYNTAX = 1    # Intel X86 asm syntax (CS_ARCH_X86 arch)
@@ -121,6 +145,21 @@ CS_OPT_SKIPDATA_SETUP = 6      # Setup user-defined function for SKIPDATA option
 CS_OPT_OFF = 0             # Turn OFF an option - default option of CS_OPT_DETAIL
 CS_OPT_ON = 3              # Turn ON an option (CS_OPT_DETAIL)
 
+# Common instruction operand types - to be consistent across all architectures.
+CS_OP_INVALID = 0
+CS_OP_REG = 1
+CS_OP_IMM = 2
+CS_OP_MEM = 3
+CS_OP_FP  = 4
+
+# Common instruction groups - to be consistent across all architectures.
+CS_GRP_INVALID = 0  # uninitialized/invalid group.
+CS_GRP_JUMP    = 1  # all jump instructions (conditional+direct+indirect jumps)
+CS_GRP_CALL    = 2  # all call instructions
+CS_GRP_RET     = 3  # all return instructions
+CS_GRP_INT     = 4  # all interrupt instructions (int+syscall)
+CS_GRP_IRET    = 5  # all interrupt return instructions
+
 # Capstone syntax value
 CS_OPT_SYNTAX_DEFAULT = 0    # Default assembly syntax of all platforms (CS_OPT_SYNTAX)
 CS_OPT_SYNTAX_INTEL = 1    # Intel X86 asm syntax - default syntax on X86 (CS_OPT_SYNTAX, CS_ARCH_X86)
@@ -129,7 +168,7 @@ CS_OPT_SYNTAX_NOREGNAME = 3   # Asm syntax prints register name with only number
 
 # Capstone error type
 CS_ERR_OK = 0      # No error: everything was fine
-CS_ERR_MEM = 1     # Out-Of-Memory error: cs_open(), cs_disasm_ex()
+CS_ERR_MEM = 1     # Out-Of-Memory error: cs_open(), cs_disasm()
 CS_ERR_ARCH = 2    # Unsupported architecture: cs_open()
 CS_ERR_HANDLE = 3  # Invalid handle: cs_op_count(), cs_op_index()
 CS_ERR_CSH = 4     # Invalid csh argument: cs_close(), cs_errno(), cs_option()
@@ -140,6 +179,8 @@ CS_ERR_MEMSETUP = 8
 CS_ERR_VERSION = 9 # Unsupported version (bindings)
 CS_ERR_DIET = 10   # Information irrelevant in diet engine
 CS_ERR_SKIPDATA = 11 # Access irrelevant data for "data" instruction in SKIPDATA mode
+CS_ERR_X86_ATT = 12 # X86 AT&T syntax is unsupported (opt-out at compile time)
+CS_ERR_X86_INTEL = 13 # X86 Intel syntax is unsupported (opt-out at compile time)
 
 # query id for cs_support()
 CS_SUPPORT_DIET = CS_ARCH_ALL + 1
@@ -190,8 +231,23 @@ if _found == False:
             break
         except OSError:
             pass
-    if _found == False:
-        raise ImportError("ERROR: fail to load the dynamic library.")
+
+# Attempt Darwin specific load (10.11 specific),
+# since LD_LIBRARY_PATH is not guaranteed to exist
+if (_found == False) and (system() == 'Darwin'):
+    _lib_path = '/usr/local/lib/'
+    for _lib in _all_libs:
+        try:
+            _lib_file = join(_lib_path, _lib)
+            # print "Trying to load:", _lib_file
+            _cs = ctypes.cdll.LoadLibrary(_lib_file)
+            _found = True
+            break
+        except OSError:
+            pass
+
+if _found == False:
+    raise ImportError("ERROR: fail to load the dynamic library.")
 
 
 # low-level structure for C code
@@ -246,7 +302,7 @@ def _setup_prototype(lib, fname, restype, *argtypes):
     getattr(lib, fname).argtypes = argtypes
 
 _setup_prototype(_cs, "cs_open", ctypes.c_int, ctypes.c_uint, ctypes.c_uint, ctypes.POINTER(ctypes.c_size_t))
-_setup_prototype(_cs, "cs_disasm_ex", ctypes.c_size_t, ctypes.c_size_t, ctypes.POINTER(ctypes.c_char), ctypes.c_size_t, \
+_setup_prototype(_cs, "cs_disasm", ctypes.c_size_t, ctypes.c_size_t, ctypes.POINTER(ctypes.c_char), ctypes.c_size_t, \
         ctypes.c_uint64, ctypes.c_size_t, ctypes.POINTER(ctypes.POINTER(_cs_insn)))
 _setup_prototype(_cs, "cs_free", None, ctypes.c_void_p, ctypes.c_size_t)
 _setup_prototype(_cs, "cs_close", ctypes.c_int, ctypes.POINTER(ctypes.c_size_t))
@@ -267,8 +323,13 @@ class CsError(Exception):
     def __init__(self, errno):
         self.errno = errno
 
-    def __str__(self):
-        return _cs.cs_strerror(self.errno)
+    if _python2:
+        def __str__(self):
+            return _cs.cs_strerror(self.errno)
+
+    else:
+        def __str__(self):
+            return _cs.cs_strerror(self.errno).decode()
 
 
 # return the core's version
@@ -294,6 +355,7 @@ class _dummy_cs(object):
     def __init__(self, csh, arch):
         self.csh = csh
         self.arch = arch
+        self._detail = False
 
 
 # Quick & dirty Python function to disasm raw binary code
@@ -312,12 +374,13 @@ def cs_disasm_quick(arch, mode, code, offset, count=0):
         raise CsError(status)
 
     all_insn = ctypes.POINTER(_cs_insn)()
-    res = _cs.cs_disasm_ex(csh, code, len(code), offset, count, ctypes.byref(all_insn))
+    res = _cs.cs_disasm(csh, code, len(code), offset, count, ctypes.byref(all_insn))
     if res > 0:
-        for i in range(res):
-            yield CsInsn(_dummy_cs(csh, arch), all_insn[i])
-
-        _cs.cs_free(all_insn, res)
+        try:
+            for i in range(res):
+                yield CsInsn(_dummy_cs(csh, arch), all_insn[i])
+        finally:
+            _cs.cs_free(all_insn, res)
     else:
         status = _cs.cs_errno(csh)
         if status != CS_ERR_OK:
@@ -352,13 +415,14 @@ def cs_disasm_lite(arch, mode, code, offset, count=0):
         raise CsError(status)
 
     all_insn = ctypes.POINTER(_cs_insn)()
-    res = _cs.cs_disasm_ex(csh, code, len(code), offset, count, ctypes.byref(all_insn))
+    res = _cs.cs_disasm(csh, code, len(code), offset, count, ctypes.byref(all_insn))
     if res > 0:
-        for i in range(res):
-            insn = all_insn[i]
-            yield (insn.address, insn.size, insn.mnemonic.decode('ascii'), insn.op_str.decode('ascii'))
-
-        _cs.cs_free(all_insn, res)
+        try:
+            for i in range(res):
+                insn = all_insn[i]
+                yield (insn.address, insn.size, insn.mnemonic.decode('ascii'), insn.op_str.decode('ascii'))
+        finally:
+            _cs.cs_free(all_insn, res)
     else:
         status = _cs.cs_errno(csh)
         if status != CS_ERR_OK:
@@ -384,7 +448,7 @@ class CsInsn(object):
     def __init__(self, cs, all_info):
         self._raw = copy_ctypes(all_info)
         self._cs = cs
-        if self._cs._detail:
+        if self._cs._detail and self._raw.id != 0:
             # save detail
             self._detail = copy_ctypes(self._raw.detail.contents)
 
@@ -474,8 +538,8 @@ class CsInsn(object):
     def __gen_detail(self):
         arch = self._cs.arch
         if arch == CS_ARCH_ARM:
-            (self.cc, self.update_flags, self.writeback, self.operands) = \
-                arm.get_arch_info(self._detail.arch.arm)
+            (self.usermode, self.vector_size, self.vector_data, self.cps_mode, self.cps_flag, self.cc, self.update_flags, \
+            self.writeback, self.mem_barrier, self.operands) = arm.get_arch_info(self._detail.arch.arm)
         elif arch == CS_ARCH_ARM64:
             (self.cc, self.update_flags, self.writeback, self.operands) = \
                 arm64.get_arch_info(self._detail.arch.arm64)
@@ -644,7 +708,7 @@ class Cs(object):
         self._detail = False  # by default, do not produce instruction details
         self._diet = cs_support(CS_SUPPORT_DIET)
         self._x86reduce = cs_support(CS_SUPPORT_X86_REDUCE)
-        
+
         # default mnemonic for SKIPDATA
         self._skipdata_mnem = ".byte"
         self._skipdata = False
@@ -654,9 +718,12 @@ class Cs(object):
     # destructor to be called automatically when object is destroyed.
     def __del__(self):
         if self.csh:
-            status = _cs.cs_close(ctypes.byref(self.csh))
-            if status != CS_ERR_OK:
-                raise CsError(status)
+            try:
+                status = _cs.cs_close(ctypes.byref(self.csh))
+                if status != CS_ERR_OK:
+                    raise CsError(status)
+            except: # _cs might be pulled from under our feet
+                pass
 
 
     # def option(self, opt_type, opt_value):
@@ -681,6 +748,16 @@ class Cs(object):
         return self._syntax
 
 
+    # syntax setter: modify assembly syntax.
+    @syntax.setter
+    def syntax(self, style):
+        status = _cs.cs_option(self.csh, CS_OPT_SYNTAX, style)
+        if status != CS_ERR_OK:
+            raise CsError(status)
+        # save syntax
+        self._syntax = style
+
+
     # return current skipdata status
     @property
     def skipdata(self):
@@ -688,7 +765,7 @@ class Cs(object):
 
 
     # setter: modify skipdata status
-    @syntax.setter
+    @skipdata.setter
     def skipdata(self, opt):
         if opt == False:
             status = _cs.cs_option(self.csh, CS_OPT_SKIPDATA, CS_OPT_OFF)
@@ -701,8 +778,6 @@ class Cs(object):
         self._skipdata = opt
 
 
-    # setter: modify "data" instruction's mnemonic for SKIPDATA
-    @syntax.setter
     def skipdata_setup(self, opt):
         _skipdata_opt = _cs_opt_skipdata()
         _mnem, _cb, _ud = opt
@@ -716,26 +791,16 @@ class Cs(object):
         self._skipdata_opt = _skipdata_opt
 
 
-    # setter: modify assembly syntax.
-    @syntax.setter
-    def syntax(self, style):
-        status = _cs.cs_option(self.csh, CS_OPT_SYNTAX, style)
-        if status != CS_ERR_OK:
-            raise CsError(status)
-        # save syntax
-        self._syntax = style
+    # check to see if this engine supports a particular arch,
+    # or diet mode (depending on @query).
+    def support(self, query):
+        return cs_support(query)
 
 
     # is detail mode enable?
     @property
     def detail(self):
         return self._detail
-
-
-    # check to see if this engine supports a particular arch,
-    # or diet mode (depending on @query).
-    def support(self, query):
-        return cs_support(query)
 
 
     # modify detail mode.
@@ -774,11 +839,13 @@ class Cs(object):
             print(code)
             code = code.encode()
             print(code)'''
-        res = _cs.cs_disasm_ex(self.csh, code, len(code), offset, count, ctypes.byref(all_insn))
+        res = _cs.cs_disasm(self.csh, code, len(code), offset, count, ctypes.byref(all_insn))
         if res > 0:
-            for i in range(res):
-                yield CsInsn(self, all_insn[i])
-            _cs.cs_free(all_insn, res)
+            try:
+                for i in range(res):
+                    yield CsInsn(self, all_insn[i])
+            finally:
+                _cs.cs_free(all_insn, res)
         else:
             status = _cs.cs_errno(self.csh)
             if status != CS_ERR_OK:
@@ -796,12 +863,14 @@ class Cs(object):
             raise CsError(CS_ERR_DIET)
 
         all_insn = ctypes.POINTER(_cs_insn)()
-        res = _cs.cs_disasm_ex(self.csh, code, len(code), offset, count, ctypes.byref(all_insn))
+        res = _cs.cs_disasm(self.csh, code, len(code), offset, count, ctypes.byref(all_insn))
         if res > 0:
-            for i in range(res):
-                insn = all_insn[i]
-                yield (insn.address, insn.size, insn.mnemonic.decode('ascii'), insn.op_str.decode('ascii'))
-            _cs.cs_free(all_insn, res)
+            try:
+                for i in range(res):
+                    insn = all_insn[i]
+                    yield (insn.address, insn.size, insn.mnemonic.decode('ascii'), insn.op_str.decode('ascii'))
+            finally:
+                _cs.cs_free(all_insn, res)
         else:
             status = _cs.cs_errno(self.csh)
             if status != CS_ERR_OK:
@@ -814,7 +883,7 @@ class Cs(object):
 def debug():
     # is Cython there?
     try:
-        import ccapstone
+        from . import ccapstone
         return ccapstone.debug()
     except:
         # no Cython, fallback to Python code below
@@ -831,8 +900,7 @@ def debug():
 
     all_archs = ""
     keys = archs.keys()
-    keys.sort()
-    for k in keys:
+    for k in sorted(keys):
         if cs_support(archs[k]):
             all_archs += "-%s" % k
 

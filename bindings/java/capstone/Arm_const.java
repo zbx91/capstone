@@ -36,15 +36,133 @@ public class Arm_const {
 	public static final int ARM_CC_LE = 14;
 	public static final int ARM_CC_AL = 15;
 
+	// Special registers for MSR
+
+	public static final int ARM_SYSREG_INVALID = 0;
+	public static final int ARM_SYSREG_SPSR_C = 1;
+	public static final int ARM_SYSREG_SPSR_X = 2;
+	public static final int ARM_SYSREG_SPSR_S = 4;
+	public static final int ARM_SYSREG_SPSR_F = 8;
+	public static final int ARM_SYSREG_CPSR_C = 16;
+	public static final int ARM_SYSREG_CPSR_X = 32;
+	public static final int ARM_SYSREG_CPSR_S = 64;
+	public static final int ARM_SYSREG_CPSR_F = 128;
+	public static final int ARM_SYSREG_APSR = 256;
+	public static final int ARM_SYSREG_APSR_G = 257;
+	public static final int ARM_SYSREG_APSR_NZCVQ = 258;
+	public static final int ARM_SYSREG_APSR_NZCVQG = 259;
+	public static final int ARM_SYSREG_IAPSR = 260;
+	public static final int ARM_SYSREG_IAPSR_G = 261;
+	public static final int ARM_SYSREG_IAPSR_NZCVQG = 262;
+	public static final int ARM_SYSREG_EAPSR = 263;
+	public static final int ARM_SYSREG_EAPSR_G = 264;
+	public static final int ARM_SYSREG_EAPSR_NZCVQG = 265;
+	public static final int ARM_SYSREG_XPSR = 266;
+	public static final int ARM_SYSREG_XPSR_G = 267;
+	public static final int ARM_SYSREG_XPSR_NZCVQG = 268;
+	public static final int ARM_SYSREG_IPSR = 269;
+	public static final int ARM_SYSREG_EPSR = 270;
+	public static final int ARM_SYSREG_IEPSR = 271;
+	public static final int ARM_SYSREG_MSP = 272;
+	public static final int ARM_SYSREG_PSP = 273;
+	public static final int ARM_SYSREG_PRIMASK = 274;
+	public static final int ARM_SYSREG_BASEPRI = 275;
+	public static final int ARM_SYSREG_BASEPRI_MAX = 276;
+	public static final int ARM_SYSREG_FAULTMASK = 277;
+	public static final int ARM_SYSREG_CONTROL = 278;
+
+	// The memory barrier constants map directly to the 4-bit encoding of
+
+	// the option field for Memory Barrier operations.
+
+	public static final int ARM_MB_INVALID = 0;
+	public static final int ARM_MB_RESERVED_0 = 1;
+	public static final int ARM_MB_OSHLD = 2;
+	public static final int ARM_MB_OSHST = 3;
+	public static final int ARM_MB_OSH = 4;
+	public static final int ARM_MB_RESERVED_4 = 5;
+	public static final int ARM_MB_NSHLD = 6;
+	public static final int ARM_MB_NSHST = 7;
+	public static final int ARM_MB_NSH = 8;
+	public static final int ARM_MB_RESERVED_8 = 9;
+	public static final int ARM_MB_ISHLD = 10;
+	public static final int ARM_MB_ISHST = 11;
+	public static final int ARM_MB_ISH = 12;
+	public static final int ARM_MB_RESERVED_12 = 13;
+	public static final int ARM_MB_LD = 14;
+	public static final int ARM_MB_ST = 15;
+	public static final int ARM_MB_SY = 16;
+
 	// Operand type for instruction's operands
 
 	public static final int ARM_OP_INVALID = 0;
 	public static final int ARM_OP_REG = 1;
-	public static final int ARM_OP_CIMM = 2;
-	public static final int ARM_OP_PIMM = 3;
-	public static final int ARM_OP_IMM = 4;
-	public static final int ARM_OP_FP = 5;
-	public static final int ARM_OP_MEM = 6;
+	public static final int ARM_OP_IMM = 2;
+	public static final int ARM_OP_MEM = 3;
+	public static final int ARM_OP_FP = 4;
+	public static final int ARM_OP_CIMM = 64;
+	public static final int ARM_OP_PIMM = 65;
+	public static final int ARM_OP_SETEND = 66;
+	public static final int ARM_OP_SYSREG = 67;
+
+	// Operand type for SETEND instruction
+
+	public static final int ARM_SETEND_INVALID = 0;
+	public static final int ARM_SETEND_BE = 1;
+	public static final int ARM_SETEND_LE = 2;
+
+	public static final int ARM_CPSMODE_INVALID = 0;
+	public static final int ARM_CPSMODE_IE = 2;
+	public static final int ARM_CPSMODE_ID = 3;
+
+	// Operand type for SETEND instruction
+
+	public static final int ARM_CPSFLAG_INVALID = 0;
+	public static final int ARM_CPSFLAG_F = 1;
+	public static final int ARM_CPSFLAG_I = 2;
+	public static final int ARM_CPSFLAG_A = 4;
+	public static final int ARM_CPSFLAG_NONE = 16;
+
+	// Data type for elements of vector instructions.
+
+	public static final int ARM_VECTORDATA_INVALID = 0;
+	public static final int ARM_VECTORDATA_I8 = 1;
+	public static final int ARM_VECTORDATA_I16 = 2;
+	public static final int ARM_VECTORDATA_I32 = 3;
+	public static final int ARM_VECTORDATA_I64 = 4;
+	public static final int ARM_VECTORDATA_S8 = 5;
+	public static final int ARM_VECTORDATA_S16 = 6;
+	public static final int ARM_VECTORDATA_S32 = 7;
+	public static final int ARM_VECTORDATA_S64 = 8;
+	public static final int ARM_VECTORDATA_U8 = 9;
+	public static final int ARM_VECTORDATA_U16 = 10;
+	public static final int ARM_VECTORDATA_U32 = 11;
+	public static final int ARM_VECTORDATA_U64 = 12;
+	public static final int ARM_VECTORDATA_P8 = 13;
+	public static final int ARM_VECTORDATA_F32 = 14;
+	public static final int ARM_VECTORDATA_F64 = 15;
+	public static final int ARM_VECTORDATA_F16F64 = 16;
+	public static final int ARM_VECTORDATA_F64F16 = 17;
+	public static final int ARM_VECTORDATA_F32F16 = 18;
+	public static final int ARM_VECTORDATA_F16F32 = 19;
+	public static final int ARM_VECTORDATA_F64F32 = 20;
+	public static final int ARM_VECTORDATA_F32F64 = 21;
+	public static final int ARM_VECTORDATA_S32F32 = 22;
+	public static final int ARM_VECTORDATA_U32F32 = 23;
+	public static final int ARM_VECTORDATA_F32S32 = 24;
+	public static final int ARM_VECTORDATA_F32U32 = 25;
+	public static final int ARM_VECTORDATA_F64S16 = 26;
+	public static final int ARM_VECTORDATA_F32S16 = 27;
+	public static final int ARM_VECTORDATA_F64S32 = 28;
+	public static final int ARM_VECTORDATA_S16F64 = 29;
+	public static final int ARM_VECTORDATA_S16F32 = 30;
+	public static final int ARM_VECTORDATA_S32F64 = 31;
+	public static final int ARM_VECTORDATA_U16F64 = 32;
+	public static final int ARM_VECTORDATA_U16F32 = 33;
+	public static final int ARM_VECTORDATA_U32F64 = 34;
+	public static final int ARM_VECTORDATA_F64U16 = 35;
+	public static final int ARM_VECTORDATA_F32U16 = 36;
+	public static final int ARM_VECTORDATA_F64U32 = 37;
 
 	// ARM registers
 
@@ -159,7 +277,7 @@ public class Arm_const {
 	public static final int ARM_REG_S29 = 108;
 	public static final int ARM_REG_S30 = 109;
 	public static final int ARM_REG_S31 = 110;
-	public static final int ARM_REG_MAX = 111;
+	public static final int ARM_REG_ENDING = 111;
 
 	// alias registers
 	public static final int ARM_REG_R13 = ARM_REG_SP;
@@ -599,42 +717,54 @@ public class Arm_const {
 	public static final int ARM_INS_MOVS = 424;
 	public static final int ARM_INS_POP = 425;
 	public static final int ARM_INS_PUSH = 426;
-	public static final int ARM_INS_MAX = 427;
+	public static final int ARM_INS_NOP = 427;
+	public static final int ARM_INS_YIELD = 428;
+	public static final int ARM_INS_WFE = 429;
+	public static final int ARM_INS_WFI = 430;
+	public static final int ARM_INS_SEV = 431;
+	public static final int ARM_INS_SEVL = 432;
+	public static final int ARM_INS_VPUSH = 433;
+	public static final int ARM_INS_VPOP = 434;
+	public static final int ARM_INS_ENDING = 435;
 
 	// Group of ARM instructions
 
 	public static final int ARM_GRP_INVALID = 0;
-	public static final int ARM_GRP_CRYPTO = 1;
-	public static final int ARM_GRP_DATABARRIER = 2;
-	public static final int ARM_GRP_DIVIDE = 3;
-	public static final int ARM_GRP_FPARMV8 = 4;
-	public static final int ARM_GRP_MULTPRO = 5;
-	public static final int ARM_GRP_NEON = 6;
-	public static final int ARM_GRP_T2EXTRACTPACK = 7;
-	public static final int ARM_GRP_THUMB2DSP = 8;
-	public static final int ARM_GRP_TRUSTZONE = 9;
-	public static final int ARM_GRP_V4T = 10;
-	public static final int ARM_GRP_V5T = 11;
-	public static final int ARM_GRP_V5TE = 12;
-	public static final int ARM_GRP_V6 = 13;
-	public static final int ARM_GRP_V6T2 = 14;
-	public static final int ARM_GRP_V7 = 15;
-	public static final int ARM_GRP_V8 = 16;
-	public static final int ARM_GRP_VFP2 = 17;
-	public static final int ARM_GRP_VFP3 = 18;
-	public static final int ARM_GRP_VFP4 = 19;
-	public static final int ARM_GRP_ARM = 20;
-	public static final int ARM_GRP_MCLASS = 21;
-	public static final int ARM_GRP_NOTMCLASS = 22;
-	public static final int ARM_GRP_THUMB = 23;
-	public static final int ARM_GRP_THUMB1ONLY = 24;
-	public static final int ARM_GRP_THUMB2 = 25;
-	public static final int ARM_GRP_PREV8 = 26;
-	public static final int ARM_GRP_FPVMLX = 27;
-	public static final int ARM_GRP_MULOPS = 28;
-	public static final int ARM_GRP_CRC = 29;
-	public static final int ARM_GRP_DPVFP = 30;
-	public static final int ARM_GRP_V6M = 31;
-	public static final int ARM_GRP_JUMP = 32;
-	public static final int ARM_GRP_MAX = 33;
+
+	// Generic groups
+	public static final int ARM_GRP_JUMP = 1;
+
+	// Architecture-specific groups
+	public static final int ARM_GRP_CRYPTO = 128;
+	public static final int ARM_GRP_DATABARRIER = 129;
+	public static final int ARM_GRP_DIVIDE = 130;
+	public static final int ARM_GRP_FPARMV8 = 131;
+	public static final int ARM_GRP_MULTPRO = 132;
+	public static final int ARM_GRP_NEON = 133;
+	public static final int ARM_GRP_T2EXTRACTPACK = 134;
+	public static final int ARM_GRP_THUMB2DSP = 135;
+	public static final int ARM_GRP_TRUSTZONE = 136;
+	public static final int ARM_GRP_V4T = 137;
+	public static final int ARM_GRP_V5T = 138;
+	public static final int ARM_GRP_V5TE = 139;
+	public static final int ARM_GRP_V6 = 140;
+	public static final int ARM_GRP_V6T2 = 141;
+	public static final int ARM_GRP_V7 = 142;
+	public static final int ARM_GRP_V8 = 143;
+	public static final int ARM_GRP_VFP2 = 144;
+	public static final int ARM_GRP_VFP3 = 145;
+	public static final int ARM_GRP_VFP4 = 146;
+	public static final int ARM_GRP_ARM = 147;
+	public static final int ARM_GRP_MCLASS = 148;
+	public static final int ARM_GRP_NOTMCLASS = 149;
+	public static final int ARM_GRP_THUMB = 150;
+	public static final int ARM_GRP_THUMB1ONLY = 151;
+	public static final int ARM_GRP_THUMB2 = 152;
+	public static final int ARM_GRP_PREV8 = 153;
+	public static final int ARM_GRP_FPVMLX = 154;
+	public static final int ARM_GRP_MULOPS = 155;
+	public static final int ARM_GRP_CRC = 156;
+	public static final int ARM_GRP_DPVFP = 157;
+	public static final int ARM_GRP_V6M = 158;
+	public static final int ARM_GRP_ENDING = 159;
 }

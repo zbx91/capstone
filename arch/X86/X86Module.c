@@ -30,7 +30,7 @@ static cs_err init(cs_struct *ud)
 	ud->insn_id = X86_get_insn_id;
 	ud->insn_name = X86_insn_name;
 	ud->group_name = X86_group_name;
-	ud->post_printer = X86_post_printer;
+	ud->post_printer = NULL;;
 
 	if (ud->mode == CS_MODE_64)
 		ud->regsize_map = regsize_map_64;
@@ -51,7 +51,7 @@ static cs_err option(cs_struct *handle, cs_opt_type type, size_t value)
 			else
 				handle->regsize_map = regsize_map_32;
 
-			handle->mode = value;
+			handle->mode = (cs_mode)value;
 			break;
 		case CS_OPT_SYNTAX:
 			switch(value) {
@@ -67,11 +67,15 @@ static cs_err option(cs_struct *handle, cs_opt_type type, size_t value)
 					break;
 
 				case CS_OPT_SYNTAX_ATT:
-#ifndef CAPSTONE_DIET
+#if !defined(CAPSTONE_DIET) && !defined(CAPSTONE_X86_ATT_DISABLE)
 					handle->printer = X86_ATT_printInst;
 					handle->syntax = CS_OPT_SYNTAX_ATT;
 					break;
-#else
+#elif !defined(CAPSTONE_DIET) && defined(CAPSTONE_X86_ATT_DISABLE)
+					// ATT syntax is unsupported
+					handle->errnum = CS_ERR_X86_ATT;
+					return CS_ERR_X86_ATT;
+#else	// CAPSTONE_DIET
 					// this is irrelevant in CAPSTONE_DIET mode
 					handle->errnum = CS_ERR_DIET;
 					return CS_ERR_DIET;

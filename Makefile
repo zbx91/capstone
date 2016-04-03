@@ -33,10 +33,24 @@ else
 CFLAGS ?= -O3
 endif
 
+ifneq (,$(findstring yes,$(CAPSTONE_X86_ATT_DISABLE)))
+CFLAGS += -DCAPSTONE_X86_ATT_DISABLE
+endif
+
 CFLAGS += -fPIC -Wall -Iinclude
 
 ifeq ($(CAPSTONE_USE_SYS_DYN_MEM),yes)
 CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
+endif
+
+ifeq ($(CAPSTONE_HAS_OSXKERNEL), yes)
+CFLAGS += -DCAPSTONE_HAS_OSXKERNEL
+SDKROOT ?= $(shell xcodebuild -version -sdk macosx Path)
+CFLAGS += -mmacosx-version-min=10.5 \
+		  -isysroot$(SDKROOT) \
+		  -I$(SDKROOT)/System/Library/Frameworks/Kernel.framework/Headers \
+		  -mkernel \
+		  -fno-builtin
 endif
 
 CFLAGS += $(foreach arch,$(LIBARCHS),-arch $(arch))
@@ -62,11 +76,17 @@ LIBDIRARCH ?= lib
 LIBDIR = $(DESTDIR)$(PREFIX)/$(LIBDIRARCH)
 
 LIBDATADIR = $(LIBDIR)
+
+# Don't redefine $LIBDATADIR when global environment variable
+# USE_GENERIC_LIBDATADIR is set. This is used by the pkgsrc framework.
+
+ifndef USE_GENERIC_LIBDATADIR
 ifeq ($(UNAME_S), FreeBSD)
 LIBDATADIR = $(DESTDIR)$(PREFIX)/libdata
 endif
 ifeq ($(UNAME_S), DragonFly)
 LIBDATADIR = $(DESTDIR)$(PREFIX)/libdata
+endif
 endif
 
 INSTALL_BIN ?= install
@@ -201,7 +221,9 @@ ifneq (,$(findstring x86,$(CAPSTONE_ARCHS)))
 	LIBOBJ_X86 += $(OBJDIR)/arch/X86/X86IntelInstPrinter.o
 # assembly syntax is irrelevant in Diet mode, when this info is suppressed
 ifeq (,$(findstring yes,$(CAPSTONE_DIET)))
+ifeq (,$(findstring yes,$(CAPSTONE_X86_ATT_DISABLE)))
 	LIBOBJ_X86 += $(OBJDIR)/arch/X86/X86ATTInstPrinter.o
+endif
 endif
 	LIBOBJ_X86 += $(OBJDIR)/arch/X86/X86Mapping.o
 	LIBOBJ_X86 += $(OBJDIR)/arch/X86/X86Module.o
@@ -234,7 +256,7 @@ PKGCFGDIR ?= $(LIBDATADIR)/pkgconfig
 API_MAJOR=$(shell echo `grep -e CS_API_MAJOR include/capstone.h | grep -v = | awk '{print $$3}'` | awk '{print $$1}')
 VERSION_EXT =
 
-IS_APPLE := $(shell $(CC) -dM -E - < /dev/null | grep __apple_build_version__ | wc -l | tr -d " ")
+IS_APPLE := $(shell $(CC) -dM -E - < /dev/null | grep -cm 1 -e __apple_build_version__ -e __APPLE_CC__)
 ifeq ($(IS_APPLE),1)
 EXT = dylib
 VERSION_EXT = $(API_MAJOR).$(EXT)
@@ -284,6 +306,7 @@ else ifeq ($(IS_CYGWIN),1)
 LIBRARY = $(BLDIR)/$(LIBNAME).$(EXT)
 else	# *nix
 LIBRARY = $(BLDIR)/lib$(LIBNAME).$(EXT)
+CFLAGS += -fvisibility=hidden
 endif
 endif
 
@@ -302,6 +325,7 @@ PKGCFGF = $(BLDIR)/$(LIBNAME).pc
 .PHONY: all clean install uninstall dist
 
 all: $(LIBRARY) $(ARCHIVE) $(PKGCFGF)
+ifeq (,$(findstring yes,$(CAPSTONE_BUILD_CORE_ONLY)))
 ifndef BUILDDIR
 	cd tests && $(MAKE)
 else
@@ -309,6 +333,7 @@ else
 endif
 ifeq ($(CAPSTONE_SHARED),yes)
 	$(INSTALL_DATA) $(LIBRARY) $(BLDIR)/tests/
+endif
 endif
 
 ifeq ($(CAPSTONE_SHARED),yes)
@@ -344,7 +369,6 @@ endif
 endif
 
 $(PKGCFGF):
-	@mkdir -p $(@D)
 ifeq ($(V),0)
 	$(call log,GEN,$(@:$(BLDIR)/%=%))
 	@$(generate-pkgcfg)
@@ -355,8 +379,6 @@ endif
 install: $(PKGCFGF) $(ARCHIVE) $(LIBRARY)
 	mkdir -p $(LIBDIR)
 ifeq ($(CAPSTONE_SHARED),yes)
-	# remove potential broken old libs
-	rm -f $(LIBDIR)/lib$(LIBNAME).*
 	$(INSTALL_LIB) $(LIBRARY) $(LIBDIR)
 ifneq ($(VERSION_EXT),)
 	cd $(LIBDIR) && \
@@ -381,16 +403,21 @@ clean:
 	rm -f $(LIBOBJ)
 	rm -f $(BLDIR)/lib$(LIBNAME).* $(BLDIR)/$(LIBNAME).*
 	rm -f $(PKGCFGF)
+
+ifeq (,$(findstring yes,$(CAPSTONE_BUILD_CORE_ONLY)))
 	cd tests && $(MAKE) clean
 	rm -f $(BLDIR)/tests/lib$(LIBNAME).$(EXT)
+endif
 
 ifdef BUILDDIR
 	rm -rf $(BUILDDIR)
 endif
 
+ifeq (,$(findstring yes,$(CAPSTONE_BUILD_CORE_ONLY)))
 	cd bindings/python && $(MAKE) clean
 	cd bindings/java && $(MAKE) clean
 	cd bindings/ocaml && $(MAKE) clean
+endif
 
 
 TAG ?= HEAD
@@ -403,6 +430,19 @@ endif
 dist:
 	git archive --format=tar.gz --prefix=capstone-$(DIST_VERSION)/ $(TAG) > capstone-$(DIST_VERSION).tgz
 	git archive --format=zip --prefix=capstone-$(DIST_VERSION)/ $(TAG) > capstone-$(DIST_VERSION).zip
+
+
+TESTS = test test_detail test_arm test_arm64 test_mips test_ppc test_sparc
+TESTS += test_systemz test_x86 test_xcore test_iter
+TESTS += test.static test_detail.static test_arm.static test_arm64.static
+TESTS += test_mips.static test_ppc.static test_sparc.static
+TESTS += test_systemz.static test_x86.static test_xcore.static
+TESTS += test_skipdata test_skipdata.static test_iter.static
+check:
+	@for t in $(TESTS); do \
+		echo Check $$t ... ; \
+		./tests/$$t > /dev/null && echo OK || echo FAILED; \
+	done
 
 $(OBJDIR)/%.o: %.c
 	@mkdir -p $(@D)
@@ -430,9 +470,8 @@ define generate-pkgcfg
 	echo 'Description: Capstone disassembly engine' >> $(PKGCFGF)
 	echo 'Version: $(PKG_VERSION)' >> $(PKGCFGF)
 	echo 'libdir=$(LIBDIR)' >> $(PKGCFGF)
-	echo 'includedir=$(PREFIX)/include/capstone' >> $(PKGCFGF)
+	echo 'includedir=$(INCDIR)/capstone' >> $(PKGCFGF)
 	echo 'archive=$${libdir}/libcapstone.a' >> $(PKGCFGF)
 	echo 'Libs: -L$${libdir} -lcapstone' >> $(PKGCFGF)
 	echo 'Cflags: -I$${includedir}' >> $(PKGCFGF)
 endef
-

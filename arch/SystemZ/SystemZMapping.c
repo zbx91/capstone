@@ -57,7 +57,7 @@ static name_map reg_name_maps[] = {
 const char *SystemZ_reg_name(csh handle, unsigned int reg)
 {
 #ifndef CAPSTONE_DIET
-	if (reg >= SYSZ_REG_MAX)
+	if (reg >= SYSZ_REG_ENDING)
 		return NULL;
 
 	return reg_name_maps[reg].name;
@@ -2734,6 +2734,12 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		SystemZ_LDXBRA, SYSZ_INS_LDXBRA,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { 0 }, { SYSZ_GRP_FPEXTENSION, 0 }, 0, 0
+#endif
+	},
+	{
 		SystemZ_LDY, SYSZ_INS_LDY,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { 0 }, 0, 0
@@ -2752,6 +2758,12 @@ static insn_map insns[] = {
 #endif
 	},
 	{
+		SystemZ_LEDBRA, SYSZ_INS_LEDBRA,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { 0 }, { SYSZ_GRP_FPEXTENSION, 0 }, 0, 0
+#endif
+	},
+	{
 		SystemZ_LER, SYSZ_INS_LER,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { 0 }, 0, 0
@@ -2761,6 +2773,12 @@ static insn_map insns[] = {
 		SystemZ_LEXBR, SYSZ_INS_LEXBR,
 #ifndef CAPSTONE_DIET
 		{ 0 }, { 0 }, { 0 }, 0, 0
+#endif
+	},
+	{
+		SystemZ_LEXBRA, SYSZ_INS_LEXBRA,
+#ifndef CAPSTONE_DIET
+		{ 0 }, { 0 }, { SYSZ_GRP_FPEXTENSION, 0 }, 0, 0
 #endif
 	},
 	{
@@ -4757,11 +4775,14 @@ static name_map insn_name_maps[] = {
 	{ SYSZ_INS_LDGR, "ldgr" },
 	{ SYSZ_INS_LDR, "ldr" },
 	{ SYSZ_INS_LDXBR, "ldxbr" },
+	{ SYSZ_INS_LDXBRA, "ldxbra" },
 	{ SYSZ_INS_LDY, "ldy" },
 	{ SYSZ_INS_LE, "le" },
 	{ SYSZ_INS_LEDBR, "ledbr" },
+	{ SYSZ_INS_LEDBRA, "ledbra" },
 	{ SYSZ_INS_LER, "ler" },
 	{ SYSZ_INS_LEXBR, "lexbr" },
+	{ SYSZ_INS_LEXBRA, "lexbra" },
 	{ SYSZ_INS_LEY, "ley" },
 	{ SYSZ_INS_LFH, "lfh" },
 	{ SYSZ_INS_LG, "lg" },
@@ -5020,7 +5041,7 @@ const char *SystemZ_insn_name(csh handle, unsigned int id)
 #ifndef CAPSTONE_DIET
 	unsigned int i;
 
-	if (id >= SYSZ_INS_MAX)
+	if (id >= SYSZ_INS_ENDING)
 		return NULL;
 
 	// handle special alias first
@@ -5037,24 +5058,31 @@ const char *SystemZ_insn_name(csh handle, unsigned int id)
 
 #ifndef CAPSTONE_DIET
 static name_map group_name_maps[] = {
+	// generic groups
 	{ SYSZ_GRP_INVALID, NULL },
+	{ SYSZ_GRP_JUMP, "jump" },
+
+	// architecture-specific groups
 	{ SYSZ_GRP_DISTINCTOPS, "distinctops" },
 	{ SYSZ_GRP_FPEXTENSION, "fpextension" },
 	{ SYSZ_GRP_HIGHWORD, "highword" },
 	{ SYSZ_GRP_INTERLOCKEDACCESS1, "interlockedaccess1" },
 	{ SYSZ_GRP_LOADSTOREONCOND, "loadstoreoncond" },
-
-	{ SYSZ_GRP_JUMP, "jump" },
 };
 #endif
 
 const char *SystemZ_group_name(csh handle, unsigned int id)
 {
 #ifndef CAPSTONE_DIET
-	if (id >= SYSZ_GRP_MAX)
+	// verify group id
+	if (id >= SYSZ_GRP_ENDING || (id > SYSZ_GRP_JUMP && id < SYSZ_GRP_DISTINCTOPS))
 		return NULL;
 
-	return group_name_maps[id].name;
+	// NOTE: when new generic groups are added, 2 must be changed accordingly
+	if (id >= 128)
+		return group_name_maps[id - 128 + 2].name;
+	else
+		return group_name_maps[id].name;
 #else
 	return NULL;
 #endif

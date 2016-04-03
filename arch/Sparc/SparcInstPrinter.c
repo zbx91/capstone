@@ -16,6 +16,10 @@
 
 #ifdef CAPSTONE_HAS_SPARC
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +38,22 @@ static char *getRegisterName(unsigned RegNo);
 static void printInstruction(MCInst *MI, SStream *O, MCRegisterInfo *MRI);
 static void printMemOperand(MCInst *MI, int opNum, SStream *O, const char *Modifier);
 static void printOperand(MCInst *MI, int opNum, SStream *O);
+
+static void Sparc_add_hint(MCInst *MI, unsigned int hint)
+{
+	if (MI->csh->detail) {
+		MI->flat_insn->detail->sparc.hint = hint;
+	}
+}
+
+static void Sparc_add_reg(MCInst *MI, unsigned int reg)
+{
+	if (MI->csh->detail) {
+		MI->flat_insn->detail->sparc.operands[MI->flat_insn->detail->sparc.op_count].type = SPARC_OP_REG;
+		MI->flat_insn->detail->sparc.operands[MI->flat_insn->detail->sparc.op_count].reg = reg;
+		MI->flat_insn->detail->sparc.op_count++;
+	}
+}
 
 static void set_mem_access(MCInst *MI, bool status)
 {
@@ -96,16 +116,18 @@ static bool printSparcAliasInstr(MCInst *MI, SStream *O)
 									MCOperand_getImm(MCInst_getOperand(MI, 2)) == 8) {
 								  switch(MCOperand_getReg(MCInst_getOperand(MI, 1))) {
 									  default: break;
-									  case SP_I7: SStream_concat0(O, "ret"); return true;
-									  case SP_O7: SStream_concat0(O, "retl"); return true;
+									  case SP_I7: SStream_concat0(O, "ret"); MCInst_setOpcodePub(MI, SPARC_INS_RET); return true;
+									  case SP_O7: SStream_concat0(O, "retl"); MCInst_setOpcodePub(MI, SPARC_INS_RETL); return true;
 								  }
 							  }
 
 							  SStream_concat0(O, "jmp\t");
+							  MCInst_setOpcodePub(MI, SPARC_INS_JMP);
 							  printMemOperand(MI, 1, O, NULL);
 							  return true;
 					 case SP_O7: // call $addr
 							  SStream_concat0(O, "call ");
+							  MCInst_setOpcodePub(MI, SPARC_INS_CALL);
 							  printMemOperand(MI, 1, O, NULL);
 							  return true;
 				 }
@@ -122,12 +144,12 @@ static bool printSparcAliasInstr(MCInst *MI, SStream *O)
 				 // if V8, skip printing %fcc0.
 				 switch(MCInst_getOpcode(MI)) {
 					 default:
-					 case SP_V9FCMPS:  SStream_concat0(O, "fcmps\t"); break;
-					 case SP_V9FCMPD:  SStream_concat0(O, "fcmpd\t"); break;
-					 case SP_V9FCMPQ:  SStream_concat0(O, "fcmpq\t"); break;
-					 case SP_V9FCMPES: SStream_concat0(O, "fcmpes\t"); break;
-					 case SP_V9FCMPED: SStream_concat0(O, "fcmped\t"); break;
-					 case SP_V9FCMPEQ: SStream_concat0(O, "fcmpeq\t"); break;
+					 case SP_V9FCMPS:  SStream_concat0(O, "fcmps\t"); MCInst_setOpcodePub(MI, SPARC_INS_FCMPS); break;
+					 case SP_V9FCMPD:  SStream_concat0(O, "fcmpd\t"); MCInst_setOpcodePub(MI, SPARC_INS_FCMPD); break;
+					 case SP_V9FCMPQ:  SStream_concat0(O, "fcmpq\t"); MCInst_setOpcodePub(MI, SPARC_INS_FCMPQ); break;
+					 case SP_V9FCMPES: SStream_concat0(O, "fcmpes\t"); MCInst_setOpcodePub(MI, SPARC_INS_FCMPES); break;
+					 case SP_V9FCMPED: SStream_concat0(O, "fcmped\t"); MCInst_setOpcodePub(MI, SPARC_INS_FCMPED); break;
+					 case SP_V9FCMPEQ: SStream_concat0(O, "fcmpeq\t"); MCInst_setOpcodePub(MI, SPARC_INS_FCMPEQ); break;
 				 }
 				 printOperand(MI, 1, O);
 				 SStream_concat0(O, ", ");
@@ -165,6 +187,77 @@ static void printOperand(MCInst *MI, int opNum, SStream *O)
 
 	if (MCOperand_isImm(MO)) {
 		Imm = (int)MCOperand_getImm(MO);
+
+		// Conditional branches displacements needs to be signextended to be
+		// able to jump backwards.
+		//
+		// Displacements are measured as the number of instructions forward or
+		// backward, so they need to be multiplied by 4
+		switch (MI->Opcode) {
+			case SP_CALL:
+				Imm = SignExtend32(Imm, 30);
+				Imm += (uint32_t)MI->address;
+				break;
+
+			// Branch on integer condition with prediction (BPcc)
+			// Branch on floating point condition with prediction (FBPfcc)
+			case SP_BPICC:
+			case SP_BPICCA:
+			case SP_BPICCANT:
+			case SP_BPICCNT:
+			case SP_BPXCC:
+			case SP_BPXCCA:
+			case SP_BPXCCANT:
+			case SP_BPXCCNT:
+			case SP_BPFCC:
+			case SP_BPFCCA:
+			case SP_BPFCCANT:
+			case SP_BPFCCNT:
+				Imm = SignExtend32(Imm, 19);
+				Imm = (uint32_t)MI->address + Imm * 4;
+				break;
+
+			// Branch on integer condition (Bicc)
+			// Branch on floating point condition (FBfcc)
+			case SP_BA:
+			case SP_BCOND:
+			case SP_BCONDA:
+			case SP_FBCOND:
+			case SP_FBCONDA:
+				Imm = SignExtend32(Imm, 22);
+				Imm = (uint32_t)MI->address + Imm * 4;
+				break;
+
+			// Branch on integer register with prediction (BPr)
+			case SP_BPGEZapn:
+			case SP_BPGEZapt:
+			case SP_BPGEZnapn:
+			case SP_BPGEZnapt:
+			case SP_BPGZapn:
+			case SP_BPGZapt:
+			case SP_BPGZnapn:
+			case SP_BPGZnapt:
+			case SP_BPLEZapn:
+			case SP_BPLEZapt:
+			case SP_BPLEZnapn:
+			case SP_BPLEZnapt:
+			case SP_BPLZapn:
+			case SP_BPLZapt:
+			case SP_BPLZnapn:
+			case SP_BPLZnapt:
+			case SP_BPNZapn:
+			case SP_BPNZapt:
+			case SP_BPNZnapn:
+			case SP_BPNZnapt:
+			case SP_BPZapn:
+			case SP_BPZapt:
+			case SP_BPZnapn:
+			case SP_BPZnapt:
+				Imm = SignExtend32(Imm, 16);
+				Imm = (uint32_t)MI->address + Imm * 4;
+				break;
+		}
+
 		if (Imm >= 0) {
 			if (Imm > HEX_THRESHOLD)
 				SStream_concat(O, "0x%x", Imm);
@@ -218,7 +311,7 @@ static void printMemOperand(MCInst *MI, int opNum, SStream *O, const char *Modif
 		return;   // don't print "+0"
 	}
 
-	SStream_concat0(O, "+");
+	SStream_concat0(O, "+");	// qq
 
 	printOperand(MI, opNum + 1, O);
 	set_mem_access(MI, false);
@@ -346,6 +439,15 @@ void Sparc_printInst(MCInst *MI, SStream *O, void *Info)
 	} else {
 		if (!printSparcAliasInstr(MI, O))
 			printInstruction(MI, O, NULL);
+	}
+}
+
+void Sparc_addReg(MCInst *MI, int reg)
+{
+	if (MI->csh->detail) {
+		MI->flat_insn->detail->sparc.operands[MI->flat_insn->detail->sparc.op_count].type = SPARC_OP_REG;
+		MI->flat_insn->detail->sparc.operands[MI->flat_insn->detail->sparc.op_count].reg = reg;
+		MI->flat_insn->detail->sparc.op_count++;
 	}
 }
 

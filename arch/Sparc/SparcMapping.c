@@ -103,13 +103,16 @@ static name_map reg_name_maps[] = {
 	{ SPARC_REG_O7, "o7"},
 	{ SPARC_REG_SP, "sp"},
 	{ SPARC_REG_Y, "y"},
+
+	// special registers
+	{ SPARC_REG_XCC, "xcc"},
 };
 #endif
 
 const char *Sparc_reg_name(csh handle, unsigned int reg)
 {
 #ifndef CAPSTONE_DIET
-	if (reg >= SPARC_REG_MAX)
+	if (reg >= SPARC_REG_ENDING)
 		return NULL;
 
 	return reg_name_maps[reg].name;
@@ -2830,7 +2833,6 @@ void Sparc_get_insn_id(cs_struct *h, cs_insn *insn, unsigned int id)
 	}
 }
 
-#ifndef CAPSTONE_DIET
 static name_map insn_name_maps[] = {
 	{ SPARC_INS_INVALID, NULL },
 
@@ -3110,8 +3112,13 @@ static name_map insn_name_maps[] = {
 	{ SPARC_INS_XNOR, "xnor" },
 	{ SPARC_INS_XORCC, "xorcc" },
 	{ SPARC_INS_XOR, "xor" },
+
+	// alias instructions
+	{ SPARC_INS_RET, "ret" },
+	{ SPARC_INS_RETL, "retl" },
 };
 
+#ifndef CAPSTONE_DIET
 // special alias insn
 static name_map alias_insn_names[] = {
 	{ 0, NULL }
@@ -3123,7 +3130,7 @@ const char *Sparc_insn_name(csh handle, unsigned int id)
 #ifndef CAPSTONE_DIET
 	unsigned int i;
 
-	if (id >= SPARC_INS_MAX)
+	if (id >= SPARC_INS_ENDING)
 		return NULL;
 
 	// handle special alias first
@@ -3140,7 +3147,11 @@ const char *Sparc_insn_name(csh handle, unsigned int id)
 
 #ifndef CAPSTONE_DIET
 static name_map group_name_maps[] = {
+	// generic groups
 	{ SPARC_GRP_INVALID, NULL },
+	{ SPARC_GRP_JUMP, "jump" },
+
+	// architecture-specific groups
 	{ SPARC_GRP_HARDQUAD, "hardquad" },
 	{ SPARC_GRP_V9, "v9" },
 	{ SPARC_GRP_VIS, "vis" },
@@ -3148,18 +3159,21 @@ static name_map group_name_maps[] = {
 	{ SPARC_GRP_VIS3,  "vis3" },
 	{ SPARC_GRP_32BIT, "32bit" },
 	{ SPARC_GRP_64BIT, "64bit" },
-
-	{ SPARC_GRP_JUMP, "jump" },
 };
 #endif
 
 const char *Sparc_group_name(csh handle, unsigned int id)
 {
 #ifndef CAPSTONE_DIET
-	if (id >= SPARC_GRP_MAX)
+	// verify group id
+	if (id >= SPARC_GRP_ENDING || (id > SPARC_GRP_JUMP && id < SPARC_GRP_HARDQUAD))
 		return NULL;
 
-	return group_name_maps[id].name;
+	// NOTE: when new generic groups are added, 2 must be changed accordingly
+	if (id >= 128)
+		return group_name_maps[id - 128 + 2].name;
+	else
+		return group_name_maps[id].name;
 #else
 	return NULL;
 #endif
@@ -3280,7 +3294,7 @@ static name_map hint_maps[] = {
 
 sparc_hint Sparc_map_hint(const char *name)
 {
-	unsigned int i, l1, l2;
+	size_t i, l1, l2;
 
 	l1 = strlen(name);
 	for(i = 0; i < ARR_SIZE(hint_maps); i++) {
