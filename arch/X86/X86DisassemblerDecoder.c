@@ -2326,6 +2326,7 @@ int decodeInstruction(struct InternalInstruction *insn,
 	insn->reader = reader;
 	insn->readerArg = readerArg;
 	insn->startLocation = startLoc;
+	insn->modRMLocation = 0;
 	insn->readerCursor = startLoc;
 	insn->mode = mode;
 
